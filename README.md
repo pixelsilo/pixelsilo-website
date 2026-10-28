@@ -67,7 +67,10 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
 ## Conventions
 
 - **Hook JS to attributes, never to Webflow classes or IDs.** Designers can then rename and restyle freely.
-- **CSS does not live in this repo.** It lives in a `code_css` HTML embed inside a hidden `code-snippets` component, which sits on every page so the CSS previews in the Designer. **Never put a `<script>` in that embed**: the Designer then skips the whole embed.
+- **All custom CSS lives in the `code-snippets` component, and nowhere else.** Not in this repo, not in Site or Page settings custom code, and not injected by JS. The Designer only renders HTML embeds, so this is the one place CSS previews while designing.
+  - The component is `code-snippets`: a Div with class `code-snippets` (`display: none`) holding one HTML embed with class `code_css`. Write CSS inside that embed's `<style>` tag.
+  - **Every page needs an instance** at the end of its Body, including new pages, CMS templates and the 404. Home has one.
+  - **Never put a `<script>` in that embed**: the Designer then skips the whole embed. JS lives in this repo.
 - Use rem units, and Webflow variables for design tokens (colours, type, spacing).
 - Hide empty Designer content with the `hide-empty` attributes above, never with CSS.
 
