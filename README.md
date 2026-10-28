@@ -72,6 +72,7 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - **Every page needs an instance** at the end of its Body, including new pages, CMS templates and the 404. Home has one.
   - **Never put a `<script>` in that embed**: the Designer then skips the whole embed. JS lives in this repo.
 - **Units: rem throughout.** px only where it has to be: 1px hairlines and borders (`Border/Hairline`).
+- **Fluid rem:** the `code_css` embed sets `html { font-size }` per range (Finsweet-style), so everything in rem scales. 16px up to 991, 14px→16px across 992–1439, 16px for 1440–1919 (the Figma 1440 and 1920 frames share sizes), then `0.8333vw` from 1920, capped at 21.33px. Mobile and tablet type sizes still need breakpoint overrides on the type classes.
 - **Design tokens are Webflow variables** (Base collection): `Colour/*`, `Line/*`, `Font/*`, `Text/*` sizes, `Space/*`, `Site/Margin`, `Border/Hairline`. They came from the v5 wireframes in the PS - Design Figma file, which had no Figma variables or styles, so values were read off the frames. The **Style guide** page (`/style-guide`) shows every token and type class. Update it when you add one.
 - Type classes (`display-xl` … `text-mono-s`) carry font, size, line height, tracking and zeroed margins. Colour is inherited; use the `text-muted` / `text-accent` wrappers or set it per element.
 - Hide empty Designer content with the `hide-empty` attributes above, never with CSS.
