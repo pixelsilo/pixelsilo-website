@@ -1,10 +1,11 @@
 import hideEmpty from './global/hide-empty.js';
+import workList from './modules/work-list.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = {};
+const MODULES = { 'work-list': workList };
 
 function boot() {
   GLOBALS.forEach((init) => {
