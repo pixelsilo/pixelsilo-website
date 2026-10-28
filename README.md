@@ -87,6 +87,7 @@ The site is drawn on a 4-column grid, and the hairlines are the grid. They're bu
 
 **Rules**
 
+0. **Always set grid rows and gaps explicitly.** If a grid only defines columns, the Designer seems to apply Webflow's default grid after load (two auto rows plus gaps). An empty second row then takes the leftover height and pushes content up. `.row` sets `grid-template-rows: auto`, `grid-auto-rows: auto` and zero gaps; the header uses `grid-template-rows: 100%`.
 0. **Build lines as Div Blocks, never custom (DOM) elements.** The Designer draws empty custom elements as roughly 72px placeholder boxes, while the browser draws them at 1px. This applies to any empty decorative element.
 1. **Lines are elements, never borders.** `.line-v` and `.line-h` are 1px divs (`Border/Hairline`) with a `line="v"` / `line="h"` attribute for future animation hooks. Cells, cards and media never get borders, so two edges can't sit side by side and double up.
 2. **One line per edge.** A horizontal line belongs to the block above it: each `.row` is followed by a `.line-h`, and a section ends with one. The Header component owns the line under it, so the hero starts without one.
