@@ -57,6 +57,15 @@ export default function (root) {
 
 Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow element the custom attribute `data-module="example"`.
 
+### Modules
+
+- **`work-list`** (`src/modules/work-list.js`, from v1.1.0) is the homepage project list, with one project open at a time.
+  - **Markup:** the root is `[data-module="work-list"]`. Each project is `[data-work="item"]`, containing a clickable row `[data-work="toggle"]` (`role="button"`, `tabindex="0"`), a panel `[data-work="panel"]`, a `+`/`−` icon `[data-work="icon"]` and a number `[data-work="num"]`.
+  - **What the JS does:** it only toggles the `is-open` combo class on the panel, icon and number. It also swaps the icon text and sets `aria-expanded` / `aria-controls`.
+  - **Styling:** done in the Designer. `.work_panel` is height 0, `.work_panel.is-open` is height auto, and the icon and number go to accent when open.
+  - **Animation:** the panel height animates over 500ms and is skipped under reduced motion.
+  - **Designer default:** put `is-open` on the first project so it shows open.
+
 ### Globals
 
 - **`hide-empty`** (`src/global/hide-empty.js`) hides empty Designer and CMS content on the live site only, so the Designer still shows everything:
