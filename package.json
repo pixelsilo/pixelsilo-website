@@ -1,0 +1,15 @@
+{
+  "name": "pixelsilo-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Custom code for the Pixel Silo Webflow site, built with Vite and served via jsDelivr.",
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "serve": "vite preview --host 127.0.0.1 --port 5500 --strictPort",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "vite": "^5.4.0"
+  }
+}
