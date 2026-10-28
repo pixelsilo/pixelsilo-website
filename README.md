@@ -92,7 +92,8 @@ The site is drawn on a 4-column grid, and the hairlines are the grid. They're bu
 1. **Lines are elements, never borders.** `.line-v` and `.line-h` are 1px divs (`Border/Hairline`) with a `line="v"` / `line="h"` attribute for future animation hooks. Cells, cards and media never get borders, so two edges can't sit side by side and double up.
 2. **One line per edge.** A horizontal line belongs to the block above it: each `.row` is followed by a `.line-h`, and a section ends with one. The Header component owns the line under it, so the hero starts without one.
 3. **Solid colour.** `Theme/Hairline` is a solid colour, not a transparent one: `#232324`, which is white 10% pre-mixed on Ink 950, and `#D5D4D1` in `theme-light`. Where two lines cross, a transparent colour would get brighter; a solid one doesn't.
-4. **Lines sit under content.** `.grid-lines` is `z-index: 0` and `.row` is `position: relative; z-index: 1`. Lines show through empty space, while media covers them and text reads on top.
+4. **Content touches the line.** As in the Figma, content starts exactly on its column's hairline: `.cell` has no left padding and keeps a right gutter (3rem desktop, 2rem tablet, 1rem mobile) before the next line. Inset content only on purpose (the reel label is 1.5rem inside the reel).
+5. **Lines sit under content.** `.grid-lines` is `z-index: 0` and `.row` is `position: relative; z-index: 1`. Lines show through empty space, while media covers them and text reads on top.
 
 **Structure of a section**
 
