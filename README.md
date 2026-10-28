@@ -87,6 +87,7 @@ The site is drawn on a 4-column grid, and the hairlines are the grid. They're bu
 
 **Rules**
 
+0. **Set gaps with Webflow's names, `grid-row-gap` / `grid-column-gap`.** Gaps set through the API as plain `row-gap` / `column-gap` render, but the Designer's Gap field shows 0 and can't edit them. Both names produce the same CSS.
 0. **Always set grid rows and gaps explicitly.** If a grid only defines columns, the Designer seems to apply Webflow's default grid after load (two auto rows plus gaps). An empty second row then takes the leftover height and pushes content up. `.row` sets `grid-template-rows: auto`, `grid-auto-rows: auto` and zero gaps; the header uses `grid-template-rows: 100%`.
 0. **Build lines as Div Blocks, never custom (DOM) elements.** The Designer draws empty custom elements as roughly 72px placeholder boxes, while the browser draws them at 1px. This applies to any empty decorative element.
 1. **Lines are elements, never borders.** `.line-v` and `.line-h` are 1px divs (`Border/Hairline`) with a `line="v"` / `line="h"` attribute for future animation hooks. Cells, cards and media never get borders, so two edges can't sit side by side and double up.
