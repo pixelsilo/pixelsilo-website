@@ -79,6 +79,38 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
 - **Light on dark, via themes.** The `Theme` variable collection holds the colour roles: `Background`, `Surface`, `Text`, `Text muted`, `Line`, `Line strong`, `Accent` (CSS `--_theme---*`). Base mode is dark; the `Light` mode swaps them to paper. Style components with Theme variables, not the raw palette, so they work in both. Add `theme-light` to a section (the Studio band) to flip it; `theme-dark` flips a block back. Body, `text-muted`, `text-accent` and the style guide lines already use Theme tokens.
 - Hide empty Designer content with the `hide-empty` attributes above, never with CSS.
 
+## Grid and hairlines
+
+The site is drawn on a 4-column grid, and the hairlines are the grid. They're built to stay pixel-tight at every width and to be animatable later.
+
+**Rules**
+
+1. **Lines are elements, never borders.** `.line-v` and `.line-h` are 1px divs (`Border/Hairline`) with a `line="v"` / `line="h"` attribute for future animation hooks. Cells, cards and media never get borders, so two edges can't sit side by side and double up.
+2. **One line per edge.** A horizontal line belongs to the block above it: each `.row` is followed by a `.line-h`, and a section ends with one. The Header component owns the line under it, so the hero starts without one.
+3. **Solid colour.** `Theme/Hairline` is a solid colour, not a transparent one: `#232324`, which is white 10% pre-mixed on Ink 950, and `#D5D4D1` in `theme-light`. Where two lines cross, a transparent colour would get brighter; a solid one doesn't.
+4. **Lines sit under content.** `.grid-lines` is `z-index: 0` and `.row` is `position: relative; z-index: 1`. Lines show through empty space, while media covers them and text reads on top.
+
+**Structure of a section**
+
+```
+section.section
+  div.row            ← 4-col grid, carries the page gutter (Site/Margin)
+    div.cell.is-col-1 …
+  div.line-h
+  div.row …
+  div.line-h
+  Grid lines         ← component, always the last child
+```
+
+- **Grid lines** component: `.grid-lines` is absolutely positioned and inset by the same gutter as `.row`. It holds `.line-v` combos `is-start` (0), `is-q1` (25%), `is-mid` (50%), `is-q3` (75%) and `is-end` (right: 0). Lines and grid columns use the same box and the same percentages, so they always line up.
+- **Collapse:** desktop has 4 columns. On tablet (≤991) there are 2 columns and `is-q1`/`is-q3` hide. On mobile (≤767) there's 1 column and `is-mid` hides too, leaving only the two edge lines.
+- **Cell placement** (combos on `.cell`): `is-col-1`, `is-col-2-3`, `is-col-2-4`, `is-col-4`, `is-col-full`, `is-aside` (column 1, hidden on tablet down), `is-col-2-4-bleed` (no inner padding, for media that should land exactly on the lines). Header-only: `is-logo`, `is-nav`, `is-nav-end`. On tablet, content placements go full width; on mobile everything stacks.
+- **Stacked dividers:** `.line-h.is-stack` goes as the first child of a cell that follows another cell. It only shows on mobile, centred in the row gap, so items that stack still get a divider.
+- **Row spacing:** `.row` is 4rem / 3rem / 2rem (desktop / tablet / mobile). `is-tight` is 2rem and vertically centred (the logo bands). `is-header` is for the header.
+- **Helpers:** `.stack` (column, 1.5rem gap) with `is-loose`, `is-split`, `is-tight`, `is-actions`. Also `.eyebrow`, `.button` / `.button.is-text` + `.button_icon`, `.media` + `.media_label` / `.media_play`, `.names`, `.marker`.
+
+The style guide page has a live demo of the grid ("05 · Grid and lines").
+
 ## Motion
 
 **Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by attribute, with no JS in this repo:
