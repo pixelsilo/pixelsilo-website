@@ -121,7 +121,7 @@ git push origin vX.Y.Z
 
 1. Check `https://cdn.jsdelivr.net/gh/pixelsilo/pixelsilo-website@vX.Y.Z/dist/site.js` returns 200 with the new build. A brand-new tag can take a minute.
 2. Bump `VERSION` in the Webflow footer loader via the Webflow API. Read the footer first, change only `VERSION`, then read it back. Update `snippets/loader.html` to match.
-3. **Ask Luke before publishing.** Every publish needs explicit approval. Publish to the `webflow.io` staging subdomain only, never a custom domain. A publish ships every pending change on the site, not just this one.
+3. Publish to the `webflow.io` staging subdomain only, **never a custom domain**. Luke has given standing permission for staging publishes (28 Oct 2026). A publish ships every pending change on the site, not just this one.
 4. On the published page, check there are no console errors and that every `[data-module]` root has `data-ready`.
 
 **Rollback:** set `VERSION` back to the previous tag, then republish with approval.
