@@ -67,6 +67,7 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
 ## Conventions
 
 - **Hook JS to attributes, never to Webflow classes or IDs.** Designers can then rename and restyle freely.
+- **Body styles go on Body (All Pages) in the Designer, not in the embed.** The Designer canvas draws Body as its own element, so a `body {}` rule in the `code_css` embed styles the live site but not the canvas. Set Body (All Pages) to: background `Theme/Background`, colour `Theme/Text`, font `Font/Sans`, size `Text/Body`, line height 1.5. The embed keeps the same rule as a fallback. `html { font-size }` (fluid rem) works from the embed.
 - **All custom CSS lives in the `code-snippets` component, and nowhere else.** Not in this repo, not in Site or Page settings custom code, and not injected by JS. The Designer only renders HTML embeds, so this is the one place CSS previews while designing.
   - The component is `code-snippets`: a Div with class `code-snippets` (`display: none`) holding one HTML embed with class `code_css`. Write CSS inside that embed's `<style>` tag.
   - **Every page needs an instance** at the end of its Body, including new pages, CMS templates and the 404. Home has one.
