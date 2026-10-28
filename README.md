@@ -81,6 +81,25 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
 - **Light on dark, via themes.** The `Theme` variable collection holds the colour roles: `Background`, `Surface`, `Text`, `Text muted`, `Line`, `Line strong`, `Accent` (CSS `--_theme---*`). Base mode is dark; the `Light` mode swaps them to paper. Style components with Theme variables, not the raw palette, so they work in both. Add `theme-light` to a section (the Studio band) to flip it; `theme-dark` flips a block back. Body, `text-muted`, `text-accent` and the style guide lines already use Theme tokens.
 - Hide empty Designer content with the `hide-empty` attributes above, never with CSS.
 
+## Editable in the Designer
+
+Everything that can be set in the Designer is set there, so it shows in the Style panel and can be edited:
+
+- **Classes and variables:** all spacing, sizes, colours and type are on classes and variables.
+- **Gaps:** use `grid-row-gap` / `grid-column-gap`.
+- **Grid placement:** uses start/end line numbers (for example `2` / `5`), never `span N`.
+- **Body styles:** on Body (All Pages).
+- **Centring:** done with flex or auto margins, never raw `transform`.
+- **Content:** text and links are native elements; double-click to edit.
+
+Only what the Designer has no control for lives in code (the `code_css` embed), so nothing there overrides a Designer edit:
+
+- **Fluid rem:** `html { font-size }`.
+- **Font smoothing:** on `body`.
+- **Selection colour:** `::selection`.
+
+One element is code by design: the **logo**. It's an inline SVG in an HTML embed (in the Header component) so it follows the theme colours. To change the logo, edit that embed's SVG.
+
 ## Grid and hairlines
 
 The site is drawn on a 4-column grid, and the hairlines are the grid. They're built to stay pixel-tight at every width and to be animatable later.
