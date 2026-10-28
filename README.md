@@ -71,7 +71,9 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - The component is `code-snippets`: a Div with class `code-snippets` (`display: none`) holding one HTML embed with class `code_css`. Write CSS inside that embed's `<style>` tag.
   - **Every page needs an instance** at the end of its Body, including new pages, CMS templates and the 404. Home has one.
   - **Never put a `<script>` in that embed**: the Designer then skips the whole embed. JS lives in this repo.
-- Use rem units, and Webflow variables for design tokens (colours, type, spacing).
+- **Units: rem throughout.** px only where it has to be: 1px hairlines and borders (`Border/Hairline`).
+- **Design tokens are Webflow variables** (Base collection): `Colour/*`, `Line/*`, `Font/*`, `Text/*` sizes, `Space/*`, `Site/Margin`, `Border/Hairline`. They came from the v5 wireframes in the PS - Design Figma file, which had no Figma variables or styles, so values were read off the frames. The **Style guide** page (`/style-guide`) shows every token and type class. Update it when you add one.
+- Type classes (`display-xl` … `text-mono-s`) carry font, size, line height, tracking and zeroed margins. Colour is inherited; use the `text-muted` / `text-accent` wrappers or set it per element.
 - Hide empty Designer content with the `hide-empty` attributes above, never with CSS.
 
 ## Motion
