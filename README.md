@@ -171,8 +171,8 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 | Target | Interaction | Effect |
 |---|---|---|
 | `split="chars"` | Reveal · chars | text splits per letter; each rises 40% and fades in (0.55s, expo out, 0.4s spread across the line). **H1 and H2 only.** |
-| `.grid-lines` (the Grid lines component) | Grid · columns ripple | as the section reaches `top 85%`, its `.line-v` columns draw down from the top (scaleY 0→1, 1.6s, expo out), 0.12s apart left to right, so the columns ripple across. |
-| `.line-h` | Grid · hairline draw | each hairline draws in from the left as it reaches `top 92%` (scaleX 0→1, 1.4s, expo out). |
+| `.grid-lines` (the Grid lines component) | Grid · columns ripple | as the section reaches `top 85%`, its `.line-v` columns draw down from the top (scaleY 0→1, 2.6s, power3 out), 0.3s apart left to right, so the columns ripple across. |
+| `.line-h` | Grid · hairline draw | each hairline draws in from the left as it reaches `top 92%` (scaleX 0→1, 2.2s, power3 out). |
 
 The grid targets are classes, not attributes, so every grid line animates with no tagging: drop in the Grid lines component or a `.line-h` and it builds. Transform origins live on the classes (`.line-v` top, `.line-h` left). Smaller text, body copy and buttons are static for now (29 Oct 2026: the full set was too busy) and get added back one section at a time. The old `line="h"` / `line="v"` attributes are unused.
 
