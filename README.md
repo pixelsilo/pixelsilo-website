@@ -161,7 +161,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Cell grid:** `row.is-panel` (no padding) with `cell.is-pad` cells for the Process stages and dashboard features. Padded cells fill line to line, with `.split` for number + meta and `.feature_visual` (a 3:1 slot) for the animated mini UI (see `lottie-stagger`).
 - **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
-- **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` for the arrow. All have hover states (see Motion).
+- **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` holding a `currentColor` SVG arrow. All have CSS hover states (see Motion).
 
 ## Motion
 
@@ -175,7 +175,17 @@ Everything else is static for now (29 Oct 2026: the full set was too busy). Smal
 
 How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%`. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
 
-Hovers: every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → `Colour/Ink 950` fill and border with paper text, text → accent), and the **Button · arrow nudge** interaction moves the hovered button's `.button_icon` 4px right. The arrow's colour is the **Button / Arrow** variable (accent in Base mode, paper in **On fill** mode). `.button:hover` switches the Button collection to On fill so the arrow goes white on the orange; `.is-outline:hover` and `.is-text:hover` set it back to Base so their arrows stay orange. Because it's a variable mode, it reaches buttons inside components and any new button without extra setup. `.nav-link`, `.work_link` and `.email-link` have colour hovers.
+**Hovers are pure CSS, never interactions.** Every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → `Colour/Ink 950` fill and border with paper text, text → accent).
+
+The arrow is an inline `<svg>` (16×16 viewBox, `fill="currentColor"`) inside `.button_icon`, so it takes the icon's CSS `color`. `.button_icon` reads two variables from the **Button** collection: `color` = **Arrow**, `left` = **Arrow shift** (it's `position: relative`, so the nudge doesn't move the text). A hover state on the button switches the collection's mode, and the icon picks it up:
+
+| Mode | Arrow | Arrow shift | Set by |
+|---|---|---|---|
+| Base | accent | 0 | default |
+| On fill | paper | 0.25rem | `.button:hover` (orange fill, so the arrow goes white) |
+| Hover | accent | 0.25rem | `.button.is-outline:hover`, `.button.is-text:hover` |
+
+It reaches buttons inside components (the footer's "Client sign in") and any new button without extra setup. For a new arrow, copy an existing `.button_icon` (↗ and → paths are on the homepage). `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
 
