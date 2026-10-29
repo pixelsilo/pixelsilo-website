@@ -163,6 +163,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
 - **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` holding a `currentColor` SVG arrow. All have CSS hover states (see Motion).
 - **Heading icon:** `.heading_icon` is an inline `<span>` holding a `currentColor` SVG, sized in em (0.57em × 0.54em, accent) so it scales with whatever heading it sits in. Used for the sparkle before "AI powered dashboard." Keep a real space in the text before it, so the heading reads correctly without the icon.
+- **Cell gutter:** text sits flush to the left column line but never touches the right one. `.cell` has `padding-right` = **Cell / Gutter**, and `.line-h` has `margin-right` = **Cell / Line bleed** (with `width: auto`), so hairlines inside a cell still run to the line. Both variables are 0 in Base mode; `.cell` switches the Cell collection to **In cell** (2rem / −2rem) and, at small, **In cell (small)** (1.25rem / −1.25rem). `.cell.is-pad` boxes are padded all round already, so they set the collection back to Base. `.line-h.is-stack` (absolute, edge to edge) keeps `margin-right: 0`. Right-aligned content in a cell (the FAQ and work +, footer location, Enquiries) is inset by the same gutter.
 
 ## Motion
 
