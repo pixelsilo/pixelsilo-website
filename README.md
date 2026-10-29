@@ -145,6 +145,15 @@ section.section
 
 The style guide page has a live demo of the grid ("05 · Grid and lines").
 
+**Components:** Header, Footer, Grid lines and code-snippets. A new page is Header, then a `main` of sections, then Footer, then code-snippets.
+
+**Section patterns used on the homepage** (reuse them on other pages):
+- **Intro:** a full-width cell with an eyebrow and a two-line heading (the second line in `.text-muted`). Add `row.is-intro` when a paragraph follows in columns 2–3.
+- **Cell grid:** `row.is-panel` (no padding) with `cell.is-pad` cells for the Process stages and dashboard features. Padded cells fill line to line, with `.split` for number + meta and `.feature_visual` + `.chip` (`is-accent`, `is-plain`) for the mini UI.
+- **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
+- **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
+- **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` for the arrow.
+
 ## Motion
 
 **Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by attribute, with no JS in this repo:
