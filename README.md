@@ -166,15 +166,17 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 
 ## Motion
 
-**Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by custom attribute, with no JS in this repo. Add the attribute to any element in the Designer and it animates; edit timing and easing in the Interactions panel (one place for the whole site).
+**Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by custom attribute or class, with no JS in this repo. Add the attribute or class to any element in the Designer and it animates; edit timing and easing in the Interactions panel (one place for the whole site).
 
-| Attribute | Interaction | Effect |
+| Target | Interaction | Effect |
 |---|---|---|
 | `split="chars"` | Reveal · chars | text splits per letter; each rises 40% and fades in (0.55s, expo out, 0.4s spread across the line). **H1 and H2 only.** |
+| `.grid-lines` (the Grid lines component) | Grid · columns ripple | as the section reaches `top 85%`, its `.line-v` columns draw down from the top (scaleY 0→1, 1.6s, expo out), 0.12s apart left to right, so the columns ripple across. |
+| `.line-h` | Grid · hairline draw | each hairline draws in from the left as it reaches `top 92%` (scaleX 0→1, 1.4s, expo out). |
 
-Everything else is static for now (29 Oct 2026: the full set was too busy). Smaller text, body copy, buttons and grid lines get added back one section at a time. The `line="h"` / `line="v"` attributes stay on the grid lines but nothing animates them.
+The grid targets are classes, not attributes, so every grid line animates with no tagging: drop in the Grid lines component or a `.line-h` and it builds. Transform origins live on the classes (`.line-v` top, `.line-h` left). Smaller text, body copy and buttons are static for now (29 Oct 2026: the full set was too busy) and get added back one section at a time. The old `line="h"` / `line="v"` attributes are unused.
 
-How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%`. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
+How they trigger: each element is its own trigger (`trigger-only` target, or `within` the trigger for the columns), starting at `top 90%` unless noted. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
 
 **Hovers are pure CSS, never interactions.** Every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → accent fill and border with paper text, text → accent).
 
