@@ -293,6 +293,7 @@ function build(name, els) {
 }
 
 const visuals = JSON.parse(fs.readFileSync(path.join(ROOT, 'lottie/visuals.json'), 'utf8'));
+fs.rmSync(OUT, { recursive: true, force: true }); // no stale files from renamed visuals
 fs.mkdirSync(OUT, { recursive: true });
 const built = {};
 for (const [name, els] of Object.entries(visuals)) {
