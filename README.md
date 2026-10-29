@@ -175,7 +175,7 @@ Everything else is static for now (29 Oct 2026: the full set was too busy). Smal
 
 How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%`. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
 
-Hovers: every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → `Line/Hairline on light`, outline → surface and full-strength border, text → accent), and the **Button · arrow nudge** interaction moves the hovered button's `.button_icon` 4px right. `.nav-link`, `.work_link` and `.email-link` have colour hovers.
+Hovers: every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → `Colour/Ink 950` fill and border with paper text, text → accent), and the **Button · arrow nudge** interaction moves the hovered button's `.button_icon` 4px right. The arrow's colour is the **Button / Arrow** variable (accent in Base mode, paper in **On fill** mode). `.button:hover` switches the Button collection to On fill so the arrow goes white on the orange; `.is-outline:hover` and `.is-text:hover` set it back to Base so their arrows stay orange. Because it's a variable mode, it reaches buttons inside components and any new button without extra setup. `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
 
