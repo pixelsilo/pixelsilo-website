@@ -161,20 +161,23 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Cell grid:** `row.is-panel` (no padding) with `cell.is-pad` cells for the Process stages and dashboard features. Padded cells fill line to line, with `.split` for number + meta and `.feature_visual` (a 3:1 slot) for the animated mini UI (see `lottie-stagger`).
 - **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
-- **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` for the arrow.
+- **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` for the arrow. All have hover states (see Motion).
 
 ## Motion
 
-**Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by attribute, with no JS in this repo:
+**Scroll reveals are native Webflow interactions (IX3)**, set up site-wide and targeted by custom attribute, with no JS in this repo. Add the attribute to any element in the Designer and it animates; edit timing and easing in the Interactions panel (one place for the whole site).
 
-| Attribute | Effect |
-|---|---|
-| `slide="item"` | the element rises and fades in |
-| `slide="children"` | its direct children rise and fade in, staggered (card grids, Collection Lists) |
-| `split="words"` | heading text splits into words that rise and fade in, staggered |
-| `split="chars"` | the same per letter (short headings only) |
+| Attribute | Interaction | Effect |
+|---|---|---|
+| `split="chars"` | Reveal · chars | text splits per letter; each rises 40% and fades in (0.55s, expo out, 0.4s spread across the line). All headings. |
+| `split="type"` | Reveal · type | mono text types on a character at a time, hard on/off (28ms a character). Eyebrows and client names. |
+| `slide="item"` | Reveal · item | fades in and rises 24px (0.9s, expo out). Body copy and buttons. |
+| `line="h"` | Reveal · line h | hairline grows from the left (1.4s, expo out; `.line-h` has transform origin left). |
+| `line="v"` | Reveal · line v | grid line grows down from the top (1.8s, expo out; `.line-v` has transform origin top). Already on every line in the Grid lines component. |
 
-All four start at `top 85%` and end at `bottom top`, with the start clamp **off**. If start equals end with clamp on, anything already past the line at load (the hero, the first section) never plays. They fire once and are set to **not animate under `prefers-reduced-motion`**. Edit timing and easing in the Interactions panel, which is one place for the whole site.
+How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%` (lines `top 95%`). Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
+
+Hovers: every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → `Line/Hairline on light`, outline → surface and full-strength border, text → accent), and the **Button · arrow nudge** interaction moves the hovered button's `.button_icon` 4px right. `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
 
