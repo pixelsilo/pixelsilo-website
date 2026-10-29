@@ -1,11 +1,12 @@
 import hideEmpty from './global/hide-empty.js';
 import workList from './modules/work-list.js';
+import lottieStagger from './modules/lottie-stagger.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = { 'work-list': workList };
+const MODULES = { 'work-list': workList, 'lottie-stagger': lottieStagger };
 
 function boot() {
   GLOBALS.forEach((init) => {
