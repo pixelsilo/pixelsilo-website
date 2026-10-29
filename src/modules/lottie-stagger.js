@@ -43,6 +43,7 @@ export default function (root) {
       // Swap the poster for the (empty) first frame only once the Lottie is ready to draw
       anim.addEventListener('DOMLoaded', () => {
         slot.querySelectorAll('img').forEach((img) => (img.style.display = 'none'));
+        slot.querySelector('svg').style.display = 'block'; // inline would add a baseline gap below
         slot.setAttribute('data-lottie-ready', '');
         observer.observe(slot);
       });
