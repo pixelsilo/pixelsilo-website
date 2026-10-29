@@ -176,15 +176,15 @@ Everything else is static for now (29 Oct 2026: the full set was too busy). Smal
 
 How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%`. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
 
-**Hovers are pure CSS, never interactions.** Every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → `Colour/Ink 950` fill and border with paper text, text → accent).
+**Hovers are pure CSS, never interactions.** Every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → accent fill with paper text, outline → accent fill and border with paper text, text → accent).
 
 The arrow is an inline `<svg>` (16×16 viewBox, `fill="currentColor"`) inside `.button_icon`, so it takes the icon's CSS `color`. `.button_icon` reads two variables from the **Button** collection: `color` = **Arrow**, `left` = **Arrow shift** (it's `position: relative`, so the nudge doesn't move the text). A hover state on the button switches the collection's mode, and the icon picks it up:
 
 | Mode | Arrow | Arrow shift | Set by |
 |---|---|---|---|
 | Base | accent | 0 | default |
-| On fill | paper | 0.25rem | `.button:hover` (orange fill, so the arrow goes white) |
-| Hover | accent | 0.25rem | `.button.is-outline:hover`, `.button.is-text:hover` |
+| On fill | paper | 0.25rem | `.button:hover`, `.button.is-outline:hover` (orange fill, so the arrow goes white) |
+| Hover | accent | 0.25rem | `.button.is-text:hover` |
 
 It reaches buttons inside components (the footer's "Client sign in") and any new button without extra setup. For a new arrow, copy an existing `.button_icon` (↗ and → paths are on the homepage). `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
