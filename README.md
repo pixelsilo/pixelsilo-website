@@ -72,8 +72,9 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
 
 - **`lottie-stagger`** (`src/modules/lottie-stagger.js`, from v1.2.0) plays the Adapt feature mini UIs once as they scroll into view, 200ms apart when several arrive together (shared across roots).
   - **Markup:** the root is `[data-module="lottie-stagger"]` (both Adapt feature rows), with an optional `data-lottie-stagger="200"` in ms. Each slot is `.feature_visual[data-lottie="adapt-01"]` (`aria-hidden="true"`), holding an Image of the matching poster (`adapt-0N.svg` asset, class `feature_poster`).
-  - **What the JS does:** it loads `lottie_light` 5.12.2 from jsDelivr, loads `lottie/<name>.json` from the same place as `site.js` (the tag, or localhost with `?dev`), hides the poster once the Lottie is ready, and plays it when 40% visible. Under reduced motion it does nothing, so the poster stays.
+  - **What the JS does:** nothing until the row is about a screen away (from v1.2.4, so the Lotties cost nothing at page load). Then it loads `lottie_light` 5.12.2 from jsDelivr, loads `lottie/<name>.json` from the same place as `site.js` (the tag, or localhost with `?dev`), hides the poster once the Lottie is ready, and plays it when 40% visible. Under reduced motion it does nothing, so the poster stays.
   - **The animations:** `lottie/build.mjs` turns `lottie/visuals.json` (the Figma frames, 384 x 128) into Lottie. It sorts each element by kind: 1px lines grow from their start, 2px content bars grow a beat later, outlined panels and arrows trace on, buttons scale from 94% and fade in, chips grow from the left with any accent fill flickering on, small squares stutter (0 1 0 1 0 1 1 0 0 1 1, 2 frames a step) and text types on a character at a time. It runs at 60fps, roughly 0.8–0.9s each, plays once and holds the last frame. Text is outlined Geist Mono, so the files need no fonts. To change one, edit `visuals.json` (or the timings at the top of `build.mjs`), run `npm run lottie -- --preview lottie/preview.html`, open the preview, then release. If a poster changes, re-upload it to Webflow.
+- **`deferred-video`** (`src/modules/deferred-video.js`, from v1.2.4) starts a muted background video once the page has loaded, so its download doesn't compete with first paint. Markup: the `<video>` itself is the root, `data-module="deferred-video"` with the file in `data-src` (no `src`), plus `muted loop playsinline autoplay preload="none"`. Webflow drops bare `muted` and `loop` attributes on publish, so give them values (`muted="muted"`, `loop="loop"`). Under reduced motion the video never loads. Used on the hero reel (`.media_video`).
 
 ### Globals
 
@@ -198,6 +199,14 @@ The arrow is an inline `<svg>` (16×16 viewBox, `fill="currentColor"`) inside `.
 It reaches buttons inside components (the footer's "Client sign in") and any new button without extra setup. For a new arrow, copy an existing `.button_icon` (↗ and → paths are on the homepage). `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
+
+## SEO and performance
+
+- **Homepage meta** (Page settings): title, description, Open Graph title, description and image (`og-pixel-silo.jpg`, a 1200 x 630 render of the hero). The style guide has its own title and description.
+- **Schema** (Page settings > Schema markup, written with the schema endpoint; the page-settings call drops it): one JSON-LD `@graph` with `ProfessionalService` (Luke as founder, Zoe, the four services), `WebSite` (en-GB) and `FAQPage` built from the six FAQ answers word for word. If an FAQ answer changes on the page, change it in the schema too. URLs point at `https://www.pixelsilo.net/`, so update them if the launch domain differs.
+- **Language:** Site settings > Custom code > Head has a one-line inline script setting `<html lang="en-GB">`, because the API can't set the site language. Set it properly in Site settings and then remove the script.
+- **Contrast:** in the Light theme mode, Accent is **Colour/Orange deep** (`#b83a0a`, 5.1:1 on paper) so small orange text passes WCAG AA; dark sections keep `#ff5b1f`.
+- **Lighthouse** (29 Oct 2026, staging): accessibility 100, best practices 100, SEO 100 apart from `is-crawlable`, which only fails because Webflow noindexes `webflow.io`. Performance: desktop 95–96, mobile 73–77. Mobile is held back by what Webflow puts in `<head>` without `defer` (jQuery, webflow.js, GSAP, SplitText, ScrollTrigger and the Google Fonts loader) and by the interactions runtime starting up (~700ms of main-thread work on a throttled phone). Measured costs on mobile: the per-letter heading split ~300ms, the mobile box reveal ~150ms, hairlines and columns ~50ms each. Self-hosting the fonts (uploading Geist as custom fonts and removing the Google fonts in Site settings) removes `webfont.js` and a stylesheet hop.
 
 ## Delivery
 
