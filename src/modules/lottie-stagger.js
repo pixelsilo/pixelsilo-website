@@ -12,6 +12,7 @@ const BASE = (document.currentScript?.src || '').replace(/[^/]*$/, '') + 'lottie
 const STAGGER = 200;
 
 let player;
+let nextAt = 0; // shared, so two roots arriving together still take turns
 function loadPlayer() {
   player ||= new Promise((resolve, reject) => {
     if (window.lottie) return resolve(window.lottie);
@@ -28,7 +29,6 @@ export default function (root) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return; // posters stay
   const stagger = Number(root.getAttribute('data-lottie-stagger')) || STAGGER;
   const slots = [...root.querySelectorAll('[data-lottie]')];
-  let nextAt = 0;
 
   loadPlayer().then((lottie) => {
     const anims = new Map();

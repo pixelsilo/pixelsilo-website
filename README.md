@@ -20,9 +20,11 @@ Use Chrome, and allow local-network access if it asks. Safari blocks `http://127
 
 `vite.config.js` builds `src/main.js` into a single IIFE called `dist/site.js`. The filename is stable and unhashed, so the CDN URL only changes with the tag. `preview: { cors: true }` lets the https Webflow page load the local build.
 
+`npm run build` runs the Lottie generator first (`npm run lottie` on its own), then Vite, which copies `public/` into `dist/`.
+
 `dist/` is committed because jsDelivr serves files straight from the repo. Always run `npm run build` before you commit a release.
 
-npm libraries get bundled. GSAP is the exception: use the copy Webflow already loads.
+npm libraries get bundled. The exceptions are GSAP (use the copy Webflow already loads) and the Lottie player, which `lottie-stagger` loads from jsDelivr only on pages that use it.
 
 ## Structure
 
@@ -32,7 +34,9 @@ src/
   global/          # site-wide init functions, run on every page
     hide-empty.js
   modules/         # opt-in modules, mounted on [data-module="<name>"]
-dist/site.js       # build output (committed)
+lottie/            # Lottie generator: visuals.json (from Figma) -> build.mjs
+public/lottie/     # generated Lottie JSON + SVG posters, copied into dist/lottie
+dist/              # build output (committed): site.js, lottie/
 snippets/
   loader.html      # the Webflow footer loader (source of truth)
 ```
@@ -65,6 +69,11 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - **Styling:** done in the Designer. `.work_panel` is height 0, `.work_panel.is-open` is height auto, and the icon and number go to accent when open.
   - **Animation:** the panel height animates over 500ms and is skipped under reduced motion.
   - **Designer default:** put `is-open` on the first project so it shows open.
+
+- **`lottie-stagger`** (`src/modules/lottie-stagger.js`, from v1.2.0) plays the Adapt feature mini UIs once as they scroll into view, 200ms apart when several arrive together (shared across roots).
+  - **Markup:** the root is `[data-module="lottie-stagger"]` (both Adapt feature rows), with an optional `data-lottie-stagger="200"` in ms. Each slot is `.feature_visual[data-lottie="adapt-01"]` (`aria-hidden="true"`), holding an Image of the matching poster (`adapt-0N.svg` asset, class `feature_poster`).
+  - **What the JS does:** it loads `lottie_light` 5.12.2 from jsDelivr, loads `lottie/<name>.json` from the same place as `site.js` (the tag, or localhost with `?dev`), hides the poster once the Lottie is ready, and plays it when 40% visible. Under reduced motion it does nothing, so the poster stays.
+  - **The animations:** `lottie/build.mjs` turns `lottie/visuals.json` (the Figma frames, 384 x 128) into Lottie. It sorts each element by kind: 1px lines grow from their start, 2px content bars grow a beat later, outlined panels and arrows trace on, buttons scale from 94% and fade in, chips grow from the left with any accent fill flickering on, small squares stutter (0 1 0 1 0 1 1 0 0 1 1, 2 frames a step) and text types on a character at a time. It runs at 60fps, roughly 0.8–0.9s each, plays once and holds the last frame. Text is outlined Geist Mono, so the files need no fonts. To change one, edit `visuals.json` (or the timings at the top of `build.mjs`), run `npm run lottie -- --preview lottie/preview.html`, open the preview, then release. If a poster changes, re-upload it to Webflow.
 
 ### Globals
 
@@ -149,7 +158,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 
 **Section patterns used on the homepage** (reuse them on other pages):
 - **Intro:** a full-width cell with an eyebrow and a two-line heading (the second line in `.text-muted`). Add `row.is-intro` when a paragraph follows in columns 2–3.
-- **Cell grid:** `row.is-panel` (no padding) with `cell.is-pad` cells for the Process stages and dashboard features. Padded cells fill line to line, with `.split` for number + meta and `.feature_visual` + `.chip` (`is-accent`, `is-plain`) for the mini UI.
+- **Cell grid:** `row.is-panel` (no padding) with `cell.is-pad` cells for the Process stages and dashboard features. Padded cells fill line to line, with `.split` for number + meta and `.feature_visual` (a 3:1 slot) for the animated mini UI (see `lottie-stagger`).
 - **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
 - **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` for the arrow.
