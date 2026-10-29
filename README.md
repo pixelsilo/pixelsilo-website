@@ -169,13 +169,11 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 
 | Attribute | Interaction | Effect |
 |---|---|---|
-| `split="chars"` | Reveal · chars | text splits per letter; each rises 40% and fades in (0.55s, expo out, 0.4s spread across the line). All headings. |
-| `split="type"` | Reveal · type | mono text types on a character at a time, hard on/off (28ms a character). Eyebrows and client names. |
-| `slide="item"` | Reveal · item | fades in and rises 24px (0.9s, expo out). Body copy and buttons. |
-| `line="h"` | Reveal · line h | hairline grows from the left (1.4s, expo out; `.line-h` has transform origin left). |
-| `line="v"` | Reveal · line v | grid line grows down from the top (1.8s, expo out; `.line-v` has transform origin top). Already on every line in the Grid lines component. |
+| `split="chars"` | Reveal · chars | text splits per letter; each rises 40% and fades in (0.55s, expo out, 0.4s spread across the line). **H1 and H2 only.** |
 
-How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%` (lines `top 95%`). Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
+Everything else is static for now (29 Oct 2026: the full set was too busy). Smaller text, body copy, buttons and grid lines get added back one section at a time. The `line="h"` / `line="v"` attributes stay on the grid lines but nothing animates them.
+
+How they trigger: each element is its own trigger (`wf:attribute` trigger, `trigger-only` target), starting at `top 90%`. Toggles are enter **play**, leave **complete**, enter back / leave back **none**: they play once, never reverse when you scroll up, and anything you jump past (a reload mid-page) is completed rather than left hidden. Reduced motion skips to the end.
 
 Hovers: every `.button` variant has a Designer `:hover` state with a 300ms colour transition (solid → `Line/Hairline on light`, outline → surface and full-strength border, text → accent), and the **Button · arrow nudge** interaction moves the hovered button's `.button_icon` 4px right. `.nav-link`, `.work_link` and `.email-link` have colour hovers.
 
