@@ -162,6 +162,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
 - **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` holding a `currentColor` SVG arrow. All have CSS hover states (see Motion).
+- **Heading icon:** `.heading_icon` is an inline `<span>` holding a `currentColor` SVG, sized in em (0.57em × 0.54em, accent) so it scales with whatever heading it sits in. Used for the sparkle before "AI powered dashboard." Keep a real space in the text before it, so the heading reads correctly without the icon.
 
 ## Motion
 
