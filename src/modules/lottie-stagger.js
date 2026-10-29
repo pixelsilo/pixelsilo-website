@@ -1,4 +1,5 @@
 // Plays Lottie files once as they scroll into view, 200ms apart when several arrive together.
+// The player and files only load once the row is about a screen away.
 // Each slot holds a poster image (the finished frame) so the Designer, no-JS and reduced motion
 // all show the final state; the Lottie replaces it once it has loaded.
 //
@@ -30,7 +31,16 @@ export default function (root) {
   const stagger = Number(root.getAttribute('data-lottie-stagger')) || STAGGER;
   const slots = [...root.querySelectorAll('[data-lottie]')];
 
-  loadPlayer().then((lottie) => {
+  // Nothing loads (player, JSON, SVG build) until the row is about a screen away,
+  // so the Lotties cost nothing during page load. The posters show until then.
+  const near = new IntersectionObserver((entries) => {
+    if (!entries.some((e) => e.isIntersecting)) return;
+    near.disconnect();
+    start();
+  }, { rootMargin: '100% 0px' });
+  near.observe(root);
+
+  const start = () => loadPlayer().then((lottie) => {
     const anims = new Map();
     slots.forEach((slot) => {
       const anim = lottie.loadAnimation({
