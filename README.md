@@ -35,12 +35,14 @@ src/
     hide-empty.js
     consent-settings.js
     consent-skin.js
+    theme-toggle.js
   modules/         # opt-in modules, mounted on [data-module="<name>"]
 lottie/            # Lottie generator: visuals.json (from Figma) -> build.mjs
 public/lottie/     # generated Lottie JSON + SVG posters, copied into dist/lottie
 dist/              # build output (committed): site.js, lottie/
 snippets/
   loader.html      # the Webflow footer loader (source of truth)
+  theme-head.html  # the saved-theme snippet at the top of the Webflow head
 ```
 
 `src/main.js` works like this:
@@ -82,7 +84,7 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - **What the JS does:** toggles `is-open` on all of those, sets `aria-expanded` and `aria-label`, staggers the rows (70ms apart), locks page scroll and makes `main` and `footer` inert. Esc closes and returns focus to the button. A link tap closes it, and so does widening past 991px. Under reduced motion all transitions are off.
   - **Styling:** done in the Designer with Theme variables. `.menu` is hidden and wiped closed with `clip-path`, `.menu.is-open` wipes open; `.menu_item.is-open` rises out of `.menu_mask`; `.menu_line.is-open` and `.menu_line.is-bottom.is-open` rotate into the cross; `.menu_button.is-open` is accent. It's a state rather than a hover because a hover sticks on touch screens. To edit the open look, add `is-open` to `.menu` (and `.menu_item` or the lines) in the Designer, then remove it.
   - **Height:** `.menu` is `calc(100dvh - 4.5rem - 1px)`, the header row plus its hairline. Webflow collapses a `calc()` containing a variable into that variable, so `4.5rem` is written out. If `Site/Header height` changes, change it here too. It's absolute inside the header, not fixed, because the page-load intro leaves a transform on `.header`.
-  - **Light and dark:** the Header component has a **Light** variant, which switches the Theme collection on `.header`. Select the Header instance on a page and pick the variant to flip the bar and the menu to paper. The default is dark.
+  - **Light and dark:** the menu uses Theme variables, so it follows the site's [theme toggle](#globals). The Header component also has a **Light** variant, which switches the Theme collection on `.header` only. Select the Header instance on a page and pick the variant to fix the bar and the menu to paper whatever the visitor chose.
 
 ### Globals
 
@@ -92,6 +94,12 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - `data-hide-if-list-empty` hides the element when the Collection List inside it has no items.
 - **`consent-settings`** (`src/global/consent-settings.js`, from v1.2.5) opens the Usercentrics privacy settings from any `[data-consent="settings"]` link or button. If the CMP hasn't loaded, the link falls through to its href, so point the href at the cookie policy.
 - **`consent-skin`** (`src/global/consent-skin.js`, from v1.2.6) brands the Usercentrics UI. See [Consent and analytics](#consent-and-analytics).
+- **`theme-toggle`** (`src/global/theme-toggle.js`, from v1.4.0) switches the whole site between dark and light from any `[data-theme="toggle"]` button.
+  - **How it works:** light is the `theme-light` class on `<html>`, which already holds the Theme variables' Light mode, so anything styled with Theme variables follows with no extra rules. Keep `theme-light` on at least one element (the Studio section has it), or Webflow stops publishing the class. Dark is the default for everyone, whatever their device is set to. A visitor's choice is saved in `localStorage` as `ps-theme` only when they press the button, and it's a preference they asked for, so it isn't behind consent.
+  - **No flash:** `snippets/theme-head.html` sits at the top of Site settings > Custom code > Head and adds the class before the first paint. The JS only does the switching, and crossfades with a View Transition where the browser has one and motion is allowed.
+  - **Markup:** two buttons in the Header component. `.theme_toggle` sits at the end of `.nav` on desktop and `.theme_toggle.is-bar` sits beside the menu button at 991px and below, because `.cell.is-nav` is hidden there. Each holds `.theme_icon`, an embed with a `currentColor` SVG. The JS sets `aria-label` and `title` to say which way it will switch.
+  - **White artwork:** the client logos and the Adapt posters and Lotties are white files, so Theme variables can't reach them. The `code_css` embed flips them with `filter: invert(1) hue-rotate(180deg)` under `.theme-light`, which turns white to ink and keeps the orange. It also turns the icon over. New white artwork needs adding to that rule.
+  - **Stays dark:** the Usercentrics banner and settings window, because `consent-skin` uses fixed colours. It reads fine over paper. The Style guide has no Header, so it has no toggle, but it does follow a saved choice.
 
 ## Conventions
 
@@ -249,7 +257,7 @@ https://cdn.jsdelivr.net/gh/pixelsilo/pixelsilo-website@vX.Y.Z/dist/site.js
 
 ### The loader
 
-`snippets/loader.html` lives in **Site settings > Custom code > Footer**. The Head holds only the descender fix and the consent and analytics tags (see [Consent and analytics](#consent-and-analytics)); no site script loads there. The loader has one `VERSION` constant, and that constant is the only thing that changes on release. `?dev` switches this browser to `http://127.0.0.1:5500/site.js`, and `?dev=off` switches back.
+`snippets/loader.html` lives in **Site settings > Custom code > Footer**. The Head holds only the saved-theme snippet (`snippets/theme-head.html`), the descender fix and the consent and analytics tags (see [Consent and analytics](#consent-and-analytics)); no site script loads there. The loader has one `VERSION` constant, and that constant is the only thing that changes on release. `?dev` switches this browser to `http://127.0.0.1:5500/site.js`, and `?dev=off` switches back.
 
 Keep `snippets/loader.html` identical to what's in Webflow. Commit it whenever `VERSION` changes.
 
