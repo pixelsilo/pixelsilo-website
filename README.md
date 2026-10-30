@@ -33,6 +33,8 @@ src/
   main.js          # entry: GLOBALS + MODULES, boot
   global/          # site-wide init functions, run on every page
     hide-empty.js
+    consent-settings.js
+    consent-skin.js
   modules/         # opt-in modules, mounted on [data-module="<name>"]
 lottie/            # Lottie generator: visuals.json (from Figma) -> build.mjs
 public/lottie/     # generated Lottie JSON + SVG posters, copied into dist/lottie
@@ -82,6 +84,8 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - `data-hide-empty` hides the element when it has no text.
   - `data-hide-empty-parent=".selector"` hides the closest matching ancestor when this element has no text.
   - `data-hide-if-list-empty` hides the element when the Collection List inside it has no items.
+- **`consent-settings`** (`src/global/consent-settings.js`, from v1.2.5) opens the Usercentrics privacy settings from any `[data-consent="settings"]` link or button. If the CMP hasn't loaded, the link falls through to its href, so point the href at the cookie policy.
+- **`consent-skin`** (`src/global/consent-skin.js`, from v1.2.6) brands the Usercentrics UI. See [Consent and analytics](#consent-and-analytics).
 
 ## Conventions
 
@@ -202,13 +206,29 @@ It reaches buttons inside components (the footer's "Client sign in") and any new
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
 
+## Consent and analytics
+
+Same accounts as the old site: Termageddon + Usercentrics (settings `Q0hwsKFJcnsAdA`), GA4 `G-ELKBMW227J` and Microsoft Clarity `tcmlnzg8yf`. Everything sits in **Site settings > Custom code > Head**, in this order:
+
+1. **Consent Mode v2 defaults**, all denied. They have to run before any Google tag; Usercentrics sends the update (`googleConsentMode` is on in its settings).
+2. **The Termageddon snippet**, unchanged: `uc-block.bundle.js`, then the CMP loader, then the translations call. `uc-block` is synchronous on purpose, because it has to be in place before anything it blocks.
+3. **GA and Clarity as Usercentrics manual markup**: `type="text/plain" data-usercentrics="<Service name>"`, which the CMP activates once that service has consent. The name must match the service name in Usercentrics exactly.
+
+Why manual markup, when `uc-block` is meant to do this: its bundle has rules for Google Analytics but none for Clarity, so Clarity is never blocked automatically, on any domain, and a Termageddon rescan doesn't change that. The old site loads Clarity through the Webflow app and it records before consent. Don't connect the Clarity app or Webflow's Google integration here, or the tags load outside this markup.
+
+- **Withdrawing consent:** the Consent Mode update stops GA straight away and neither tag loads on the next page. One `scroll` event recorded while consent was still granted can leave in GA's 5-second batch. Clarity keeps running on the current page until navigation, unless **Microsoft Clarity consent signal** is enabled in Usercentrics. `_ga`, `_ga_*` and `_clck` stay in the browser after withdrawal.
+- **Skin:** the banner renders in an open shadow root and defines its colours there, so page CSS can't reach it. `consent-skin` attaches one stylesheet to that root. Colours are the Webflow variables on `:root` (custom properties inherit into shadow DOM), so they follow the Designer. Accept and Deny share a style on purpose: the ICO asks for equal prominence. The site loads Geist up to 500, so `font-synthesis: none` stops the UI's 700 turning into a fake bold. The Usercentrics dashboard's colours and Custom CSS are the official route if the skin ever breaks after a Usercentrics update.
+- **Policy pages:** `/privacy-policy` and `/cookie-policy` hold the Termageddon embeds. The footer's Privacy settings link and the cookie page's button use `data-consent="settings"`.
+- **To test:** in a fresh browser nothing from `googletagmanager.com` or `clarity.ms` should load before a choice; after Accept, GA hits carry `gcs=G101`.
+
 ## SEO and performance
 
 - **Homepage meta** (Page settings): title, description, Open Graph title, description and image (`og-pixel-silo.jpg`, a 1200 x 630 render of the hero). The style guide has its own title and description.
 - **Schema** (Page settings > Schema markup, written with the schema endpoint; the page-settings call drops it): one JSON-LD `@graph` with `ProfessionalService` (Luke as founder, Zoe, the four services), `WebSite` (en-GB) and `FAQPage` built from the six FAQ answers word for word. If an FAQ answer changes on the page, change it in the schema too. URLs point at `https://www.pixelsilo.net/`, so update them if the launch domain differs.
-- **Language:** Site settings > Custom code > Head has a one-line inline script setting `<html lang="en-GB">`, because the API can't set the site language. Set it properly in Site settings and then remove the script.
+- **Language:** `lang="en-GB"` comes from Webflow's site language setting.
 - **Contrast:** in the Light theme mode, Accent is **Colour/Orange deep** (`#b83a0a`, 5.1:1 on paper) so small orange text passes WCAG AA; dark sections keep `#ff5b1f`.
 - **Lighthouse** (29 Oct 2026, staging): accessibility 100, best practices 100, SEO 100 apart from `is-crawlable`, which only fails because Webflow noindexes `webflow.io`. Performance: desktop 93–97, mobile 78–92 (measured with the per-letter heading split off on phones; it is back on, which adds roughly 300ms of blocking time on a throttled phone). Mobile is held back by what Webflow puts in `<head>` without `defer` (jQuery, webflow.js, GSAP, SplitText, ScrollTrigger) and by the interactions runtime starting up (~700ms of main-thread work on a throttled phone). Measured costs on mobile: the per-letter heading split ~300ms, the mobile box reveal ~150ms, hairlines and columns ~50ms each. Fonts are self-hosted custom fonts (Geist and Geist Mono, Regular and Medium only, same family names as the old Google fonts, `font-display: swap`), replaced with WOFF2 subset to Latin, Latin-1, general punctuation, arrows, minus, € and ™ (14-16KB each, from 43-46KB). If copy needs a character outside that set it falls back to Arial, so re-subset from the original TTFs (fontTools `pyftsubset`). The two PNG client logos (Far and Wide, True Beauty) are now 64px-tall WebP (2-3KB, from 44KB and 9KB). What Lighthouse still flags and can't be fixed from the site: Webflow's head scripts, the webflow.io server response (~650ms; the custom domain on Webflow's CDN should be quicker), unsized logo images (the API can't set image width/height; CLS is 0 anyway) and the 9MB hero video (loads after the page).
+- **Consent banner cost** (30 Oct 2026, staging, with the banner live): accessibility, best practices and SEO still 100. Performance: desktop 89–92, mobile 50–63. On a first mobile visit the banner's description text is the largest paint (23,660px² against 17,380px² for `.text-lead`), so LCP becomes the moment the banner appears, about 5.4–6.3s under throttling, up from 3.1–4.6s. Lighthouse always tests a first visit; returning visitors never see the banner. Preconnects to the CMP hosts were tried and made no measurable difference, so they were removed. The only ways under `.text-lead` are shorter consent copy or 12px type, and the banner stays as it is.
 
 ## Delivery
 
@@ -222,7 +242,7 @@ https://cdn.jsdelivr.net/gh/pixelsilo/pixelsilo-website@vX.Y.Z/dist/site.js
 
 ### The loader
 
-`snippets/loader.html` lives in **Site settings > Custom code > Footer**. The **Head is left empty.** The loader has one `VERSION` constant, and that constant is the only thing that changes on release. `?dev` switches this browser to `http://127.0.0.1:5500/site.js`, and `?dev=off` switches back.
+`snippets/loader.html` lives in **Site settings > Custom code > Footer**. The Head holds only the descender fix and the consent and analytics tags (see [Consent and analytics](#consent-and-analytics)); no site script loads there. The loader has one `VERSION` constant, and that constant is the only thing that changes on release. `?dev` switches this browser to `http://127.0.0.1:5500/site.js`, and `?dev=off` switches back.
 
 Keep `snippets/loader.html` identical to what's in Webflow. Commit it whenever `VERSION` changes.
 
