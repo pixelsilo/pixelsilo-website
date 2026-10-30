@@ -174,7 +174,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
 - **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` holding a `currentColor` SVG arrow. All have CSS hover states (see Motion).
 - **Heading icon:** `.heading_icon` is an inline `<span>` holding a `currentColor` SVG, sized in em (0.57em × 0.54em, accent) so it scales with whatever heading it sits in. Used for the sparkle before "AI powered dashboard." Keep a real space in the text before it, so the heading reads correctly without the icon.
-- **Cell gutter:** text sits flush to the left column line but never touches the right one. `.cell` has `padding-right` = **Cell / Gutter**, and `.line-h` has `margin-right` = **Cell / Line bleed** (with `width: auto`), so hairlines inside a cell still run to the line. Both variables are 0 in Base mode; `.cell` switches the Cell collection to **In cell** (2rem / −2rem) and, at small, **In cell (small)** (1.25rem / −1.25rem). `.cell.is-pad` boxes are padded all round already, so they set the collection back to Base. `.line-h.is-stack` (absolute, edge to edge) keeps `margin-right: 0`. Right-aligned content in a cell (the FAQ and work +, footer location, Enquiries) is inset by the same gutter.
+- **Cell gutter:** text sits flush to the left column line but never touches the right one. `.cell` has `padding-right` = **Cell / Gutter**, and `.line-h` has `margin-right` = **Cell / Line bleed** (with `width: auto`), so hairlines inside a cell still run to the line. Both variables are 0 in Base mode; `.cell` switches the Cell collection to **In cell** (2rem / −2rem) and, at small, **In cell (small)** (1.25rem / −1.25rem). `.cell.is-pad` boxes are padded all round already, so they set the collection back to Base. `.line-h.is-stack` (absolute, edge to edge) keeps `margin-right: 0`. Right-aligned content in a cell (the FAQ and work +) is inset by the same gutter. The exceptions, on desktop only, are Enquiries (`.cell.is-nav-end`) and the footer location (`.cell.is-col-4.is-flush`), which sit on the right-hand line; both get the gutter back on tablet down.
 
 ## Motion
 
@@ -208,7 +208,7 @@ The arrow is an inline `<svg>` (16×16 viewBox, `fill="currentColor"`) inside `.
 | On fill | paper | 0.25rem | `.button:hover`, `.button.is-outline:hover` (orange fill, so the arrow goes white) |
 | Hover | accent | 0.25rem | `.button.is-text:hover` |
 
-It reaches buttons inside components (the footer's "Client sign in") and any new button without extra setup. For a new arrow, copy an existing `.button_icon` (↗ and → paths are on the homepage). `.nav-link`, `.menu_link`, `.work_link` and `.email-link` have colour hovers.
+It reaches buttons inside components (the footer's "Client sign in") and any new button without extra setup. For a new arrow, copy an existing `.button_icon` (↗ and → paths are on the homepage). `.nav-link`, `.menu_link`, `.work_link` and `.email-link` have colour hovers. Client sign in carries `.nav_icon`, an embed holding a `currentColor` SVG (0.75rem square), and its label is a Text Block beside it so it stays editable.
 
 GSAP in JS (the copy Webflow already loads, not bundled) is only for things interactions can't express. Gate it on GSAP being present and on no reduced motion.
 
