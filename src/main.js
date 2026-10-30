@@ -1,13 +1,14 @@
 import hideEmpty from './global/hide-empty.js';
 import consentSettings from './global/consent-settings.js';
 import consentSkin from './global/consent-skin.js';
+import themeToggle from './global/theme-toggle.js';
 import workList from './modules/work-list.js';
 import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
 import mobileMenu from './modules/mobile-menu.js';
 
 // Site-wide behaviour that runs on every page
-const GLOBALS = [hideEmpty, consentSettings, consentSkin];
+const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {
