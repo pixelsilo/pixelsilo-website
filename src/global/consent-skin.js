@@ -38,6 +38,11 @@ const CSS = `
   --typography-font: Geist, Arial, sans-serif;
 }
 
+/* The UI asks for weight 700 and the site only loads up to 500: use 500, don't fake a bold */
+* {
+  font-synthesis: none;
+}
+
 #uc-main-dialog {
   border: 1px solid var(--line--hairline);
   border-radius: 0;
