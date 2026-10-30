@@ -4,12 +4,18 @@ import consentSkin from './global/consent-skin.js';
 import workList from './modules/work-list.js';
 import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
+import mobileMenu from './modules/mobile-menu.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty, consentSettings, consentSkin];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
-const MODULES = { 'work-list': workList, 'lottie-stagger': lottieStagger, 'deferred-video': deferredVideo };
+const MODULES = {
+  'work-list': workList,
+  'lottie-stagger': lottieStagger,
+  'deferred-video': deferredVideo,
+  'mobile-menu': mobileMenu,
+};
 
 function boot() {
   GLOBALS.forEach((init) => {
