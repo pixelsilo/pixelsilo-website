@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>dashboard-loop test</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --font--sans: Geist, Arial, sans-serif; --font--mono: "Geist Mono", Arial, sans-serif;
+    --_theme---background:#0b0b0c; --_theme---surface:#17171a; --_theme---text:#f2f1ee; --_theme---text-muted:#8a8a8e;
+    --_theme---accent:#ff5b1f; --_theme---line:#232324; --_theme---line-strong:#36363a; --_theme---hairline:#232324; }
+  .theme-light { --_theme---background:#f2f1ee; --_theme---surface:#e9e8e4; --_theme---text:#1a1a1c; --_theme---text-muted:#5e5e62;
+    --_theme---accent:#b83a0a; --_theme---line:#d5d4d1; --_theme---line-strong:#bdbcb8; --_theme---hairline:#d5d4d1; }
+  body { margin:0; background:var(--_theme---background); color:var(--_theme---text); font-family:var(--font--sans); }
+  .band { background:var(--_theme---surface); padding:4rem 2rem; }
+  .wrap { max-width:1400px; margin:0 auto; }
+  button { position:fixed; top:1rem; right:1rem; z-index:9; }
+</style>
+</head>
+<body>
+<button data-theme="toggle">theme</button>
+<div style="height:120vh"></div>
+<section class="band"><div class="wrap"><div data-module="dashboard-loop" data-avatar="luke.jpg"></div></div></section>
+<div style="height:40vh"></div>
+<section class="band"><div class="wrap" style="max-width:420px"><div data-module="dashboard-loop" data-layout="portrait" data-avatar="luke.jpg"></div></div></section>
+<div style="height:120vh"></div>
+<script src="../dist/site.js"></script>
+<!-- No Webflow here: run the queued boot ourselves. -->
+<script>window.Webflow.forEach((fn) => fn());
+// ?big: show the portrait at 900px for inspection. ?f=N: freeze both loops on frame N.
+// Boot runs on DOMContentLoaded, so these run after it.
+document.addEventListener("DOMContentLoaded", () => {
+const q = new URLSearchParams(location.search);
+if (q.has("big")) document.querySelector(".wrap[style]").style.maxWidth = "560px";
+if (q.has("f")) document.querySelectorAll("[data-module=dashboard-loop]").forEach((r) => r.dashboardLoop.freeze(+q.get("f")));
+});
+</script>
+</body>
+</html>

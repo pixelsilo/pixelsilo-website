@@ -6,6 +6,7 @@ import workList from './modules/work-list.js';
 import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
 import mobileMenu from './modules/mobile-menu.js';
+import dashboardLoop from './modules/dashboard-loop/index.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
@@ -16,6 +17,7 @@ const MODULES = {
   'lottie-stagger': lottieStagger,
   'deferred-video': deferredVideo,
   'mobile-menu': mobileMenu,
+  'dashboard-loop': dashboardLoop,
 };
 
 function boot() {

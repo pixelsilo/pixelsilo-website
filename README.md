@@ -24,7 +24,7 @@ Use Chrome, and allow local-network access if it asks. Safari blocks `http://127
 
 `dist/` is committed because jsDelivr serves files straight from the repo. Always run `npm run build` before you commit a release.
 
-npm libraries get bundled. The exceptions are GSAP (use the copy Webflow already loads) and the Lottie player, which `lottie-stagger` loads from jsDelivr only on pages that use it.
+npm libraries get bundled (Preact for the dashboard loop). The exceptions are GSAP (use the copy Webflow already loads) and the Lottie player, which `lottie-stagger` loads from jsDelivr only on pages that use it.
 
 ## Structure
 
@@ -86,6 +86,12 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - **Height:** `.menu` is `calc(100dvh - 4.5rem - 1px)`, the header row plus its hairline. Webflow collapses a `calc()` containing a variable into that variable, so `4.5rem` is written out. If `Site/Header height` changes, change it here too. It's absolute inside the header, not fixed, because the page-load intro leaves a transform on `.header`.
   - **Light and dark:** the menu uses Theme variables, so it follows the site's [theme toggle](#globals). The Header component also has a **Light** variant, which switches the Theme collection on `.header` only. Select the Header instance on a page and pick the variant to fix the bar and the menu to paper whatever the visitor chose.
 
+- **`dashboard-loop`** (`src/modules/dashboard-loop/`, from v1.5.0) is the "Your dashboard" animation: an 18.5-second seamless loop of one website build, drawn live in the page rather than played as a video, so it has a transparent background, follows the theme toggle and costs about 10KB gzipped.
+  - **Markup:** an empty Div Block with `data-module="dashboard-loop"`, in the `.media.is-wide` slot of the Your dashboard section (or wherever it should play). `data-layout="auto"` shows the 3:4 portrait version at 767px and below and the 2560 × 1072 wide version above; `"wide"` (the default) or `"portrait"` fixes one. `data-avatar` is the URL of Luke's photo for the update card (upload `luke.jpg` as a Webflow asset and paste its URL); without it the card shows initials. The div sizes itself (`aspect-ratio`), so give it the width you want and nothing else. The Designer canvas shows it empty, so keep the section's other content realistic.
+  - **How it works:** `wide.jsx` and `portrait.jsx` are pure functions from a frame number to markup (ported from the Remotion edit in the dashboard repo, `docs/marketing/launch-loop`), rendered with Preact into a fixed-size stage that is scaled to the div's width, so nothing reflows and the pixel alignment holds at any size. `index.js` runs the clock (time-based, so a dropped frame skips rather than slows), pauses it when the div is off screen, and under reduced motion draws one still frame (everything in, marked done). `motion.js` has the easing and tweens, `data.js` the story (stages, platforms, the six items and their replies), `parts.jsx` the shared pieces.
+  - **Colours:** `theme.js` maps the Theme variables (`--_theme---text`, `--_theme---text-muted`, `--_theme---accent`, `--_theme---background`, `--_theme---hairline`, `--_theme---line-strong`) onto `--lp-*` custom properties on the root, so the loop flips with `theme-light` like everything else. Cards use the Background colour so they stand off the Surface band; override any `--lp-*` on the root from CSS to change that.
+  - **Testing:** `dev/dashboard-loop.html` runs both layouts outside Webflow with fake Theme variables and a theme button (`npm run serve`, then open `/dev/dashboard-loop.html`; `?f=560` freezes both on a frame, `?big` enlarges the portrait). On the page itself, `root.dashboardLoop.freeze(frame)` holds a frame in the console.
+  - **Build:** JSX is Preact via esbuild's `jsxFactory: 'h'` in `vite.config.js`; `preact` is the only runtime dependency the site bundles.
 ### Globals
 
 - **`hide-empty`** (`src/global/hide-empty.js`) hides empty Designer and CMS content on the live site only, so the Designer still shows everything:
