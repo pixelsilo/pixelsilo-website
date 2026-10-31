@@ -5,7 +5,7 @@ export const mono = { fontFamily: T.mono, textTransform: 'uppercase', letterSpac
 
 /** Words rise out of a mask, each a few frames after the last. */
 export const Words = ({ words, f, start, end, size }) => (
-  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', columnGap: size * 0.26, fontWeight: 500, fontSize: size, letterSpacing: '-0.05em', lineHeight: 1 }}>
+  <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', columnGap: size * 0.26, fontWeight: 500, fontSize: size, letterSpacing: '-0.045em', lineHeight: 1 }}>
     {words.map((w, i) => {
       const y = tween(f, start + i * 5, 34, 115, 0, OUT) + tween(f, end + i * 2, 18, 0, -115, IN);
       return (
@@ -54,7 +54,7 @@ export const panel = (extra = {}) => ({
 
 export const Head = ({ n, label, right }) => (
   <div style={{ height: 60, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 28px', borderBottom: `1px solid ${T.line}`, background: T.head }}>
-    <span style={{ ...mono, fontSize: 19, color: T.text, fontWeight: 500 }}>
+    <span style={{ ...mono, fontSize: 19, color: T.grey }}>
       <span style={{ color: T.accent, marginRight: 14 }}>{n}</span>
       {label}
     </span>

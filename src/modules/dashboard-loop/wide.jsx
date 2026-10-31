@@ -92,7 +92,7 @@ const Hub = ({ f }) => {
               <span style={{ flex: 1, color: stage >= 2 ? T.grey : T.text }}>{it.title}</span>
               <span style={{ position: 'relative', width: 250, height: 30, overflow: 'hidden', textAlign: 'right', ...mono, fontSize: 16 }}>
                 <span style={{ position: 'absolute', right: 0, top: Math.round(-stage * 30), color: T.accent }}>Needed</span>
-                <span style={{ position: 'absolute', right: 0, top: Math.round((1 - stage) * 30), color: T.text }}>Sent</span>
+                <span style={{ position: 'absolute', right: 0, top: Math.round((1 - stage) * 30), color: T.grey }}>Sent</span>
                 <span style={{ position: 'absolute', right: 0, top: Math.round((2 - stage) * 30), color: T.grey, display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
                   <Tick p={Math.min(1, rec)} size={16} color={T.grey} /> Done
                 </span>
@@ -112,10 +112,10 @@ const Hub = ({ f }) => {
               <div style={{ position: 'absolute', inset: 0, padding: '16px 24px', opacity: inn, transform: `translateY(${Math.round((1 - inn) * 16)}px)` }}>
                 <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
                   <div style={{ fontSize: 20, lineHeight: 1.25, color: done >= 1 ? T.grey : T.text, whiteSpace: it.chips.length ? 'nowrap' : 'normal', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1, minWidth: 0 }}>{it.reply}</div>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none', marginTop: 3, ...mono, fontSize: 15, color: done > 0 ? T.text : T.accent, opacity: done > 0 ? done : inn }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: 8, flex: 'none', marginTop: 3, ...mono, fontSize: 15, color: done > 0 ? T.grey : T.accent, opacity: done > 0 ? done : inn }}>
                     {done > 0 ? (
                       <Fragment>
-                        <Tick p={done} size={16} color={T.text} /> Done
+                        <Tick p={done} size={16} color={T.grey} /> Done
                       </Fragment>
                     ) : (
                       'New'
@@ -161,7 +161,7 @@ const Summary = ({ f }) => {
   return (
     <div style={{ position: 'absolute', left: 480, top: 240, width: 1600, opacity: e.opacity, transform: `translateY(${e.y}px)` }}>
       <div style={{ ...mono, fontSize: 20, color: T.grey, marginBottom: 20 }}>
-        Renaissance <span style={{ color: T.text }}>/ Overview</span>
+        Renaissance / Overview
       </div>
       <div style={{ position: 'relative', paddingLeft: 40 }}>
         <div style={{ position: 'absolute', left: 0, top: 0, width: 4, height: `${bar * 100}%`, background: T.accent }} />
@@ -222,7 +222,7 @@ export const View = ({ f, avatar }) => {
       {/* Counter and project header. */}
       <div style={{ position: 'absolute', left: 120, top: 70, opacity: chrome }}>
         <div style={{ ...mono, fontSize: 20, color: T.grey }}>
-          Renaissance <span style={{ color: T.text }}>/ Website rebuild</span>
+          Renaissance / Website rebuild
         </div>
         <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, marginTop: 10 }}>
           <span style={{ fontSize: 120, fontWeight: 500, letterSpacing: '-0.05em', lineHeight: 1, fontVariantNumeric: 'tabular-nums', minWidth: 200 }}>{Math.round(pct)}</span>
@@ -237,7 +237,7 @@ export const View = ({ f, avatar }) => {
       {f < 160 || f >= 986 ? (
         <div style={{ position: 'absolute', inset: 0, display: 'flex', justifyContent: 'center', alignItems: 'center', paddingBottom: 120, boxSizing: 'border-box' }}>
           <div style={{ maxWidth: early ? 1600 : 2400 }}>
-            <Words words={early ? HOOK : ANSWER} f={f} start={early ? 22 : 994} end={early ? 118 : 1058} size={early ? 180 : 150} />
+            <Words words={early ? HOOK : ANSWER} f={f} start={early ? 22 : 994} end={early ? 118 : 1058} size={110} />
           </div>
         </div>
       ) : null}
@@ -276,7 +276,7 @@ export const View = ({ f, avatar }) => {
           return (
             <div key={s} style={{ position: 'absolute', left: i * SEG, width: SEG - 10, top: 0, height: 6, background: T.line2 }}>
               <div style={{ position: 'absolute', left: 0, top: 0, height: 6, width: `${fill * 100}%`, background: done && i < 7 ? T.text : T.accent, opacity: 0.8 + cascade(i) * 0.2 }} />
-              <div style={{ position: 'absolute', left: 0, top: 24, display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap', ...mono, fontSize: 16, color: active ? T.accent : done ? T.text : T.grey, opacity: chrome, transform: `translateY(${Math.round((1 - tween(f, 84 + i * 3, 30, 0, 1, OUT)) * 14)}px)` }}>
+              <div style={{ position: 'absolute', left: 0, top: 24, display: 'flex', alignItems: 'center', gap: 10, whiteSpace: 'nowrap', ...mono, fontSize: 16, color: active ? T.accent : T.grey, opacity: chrome, transform: `translateY(${Math.round((1 - tween(f, 84 + i * 3, 30, 0, 1, OUT)) * 14)}px)` }}>
                 <span style={{ color: T.accent }}>0{i + 1}</span>
                 {s}
                 <span style={{ width: 18, height: 18, display: 'block', marginLeft: 2 }}>{done ? <Tick p={Math.min(1, tween(f, FILL[i][1], 18, 0, 1, OUT))} size={18} color={cascade(i) > 0.5 ? T.accent : T.text} /> : null}</span>
