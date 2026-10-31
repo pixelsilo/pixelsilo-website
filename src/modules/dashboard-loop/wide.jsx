@@ -185,7 +185,7 @@ const Update = ({ f, avatar }) => {
   if (f < 865 || f > 990) return null;
   const e = enterLeave(f, 872, 956);
   return (
-    <div style={panel({ left: 780, top: 300, width: 1000, opacity: e.opacity, transform: `translateY(${e.y}px)` })}>
+    <div style={panel({ left: 940, top: 300, width: 680, opacity: e.opacity, transform: `translateY(${e.y}px)` })}>
       <Head n="[ 06 ]" label="Latest update" right="Today" />
       <div style={{ padding: 32 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
@@ -193,7 +193,11 @@ const Update = ({ f, avatar }) => {
           <span style={{ fontSize: 24, fontWeight: 500 }}>Luke Willson</span>
           <span style={{ ...mono, fontSize: 16, color: T.grey }}>Pixel Silo</span>
         </div>
-        <p style={{ fontSize: 34, lineHeight: 1.3, letterSpacing: '-0.02em', margin: '22px 0 0' }}>Homepage is on staging. Have a look, and tell me what you think.</p>
+        <p style={{ fontSize: 34, lineHeight: 1.3, letterSpacing: '-0.02em', margin: '22px 0 0', whiteSpace: 'nowrap' }}>
+          Homepage is on staging.
+          <br />
+          Have a look, and tell me what you think.
+        </p>
         <div style={{ ...mono, fontSize: 18, color: T.accent, marginTop: 22 }}>Staging site ↗</div>
       </div>
     </div>
