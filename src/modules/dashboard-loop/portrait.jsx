@@ -12,15 +12,15 @@ export const DURATION = 1110;
 export const STILL = 700;
 
 const SQUARE = 83;
-const M = 80; // side margin
+const M = 0; // no side margin: content touches the site's outer hairlines
 const RAIL_Y = 1440;
 const RAIL_L = M;
 const RAIL_W = W - 2 * M;
-const SEG = RAIL_W / 8;
+const SEG = (RAIL_W + 10) / 8; // each segment leaves a 10px gap, so the last one ends on the edge
 // Motion, design and build keep moving through the hub: assets drip in while the work carries on.
 const FILL = [[125, 165], [165, 210], [210, 262], [262, 390], [390, 520], [520, 870], [870, 940], [940, 990]];
 
-const TILE = { y: 250, w: 250, h: 100, gap: 13 };
+const TILE = { y: 250, w: 291, h: 100, gap: 12 };
 const LIST = { y: 376, row: 60 };
 const REPLIES = { y: 822, row: 76 };
 const HUB_IN = 270;
@@ -229,7 +229,7 @@ export const View = ({ f, avatar }) => {
         if (f < at || f > at + 60) return null;
         const e = enterLeave(f, at, at + 28);
         return (
-          <div key={i} style={panel({ left: M + i * 350, top: 1180, width: 340, height: 124, opacity: e.opacity, transform: `translateY(${Math.round(e.y - tween(f, at, 60, 0, 20, LINEAR))}px)` })}>
+          <div key={i} style={panel({ left: M + i * 404, top: 1180, width: 392, height: 124, opacity: e.opacity, transform: `translateY(${Math.round(e.y - tween(f, at, 60, 0, 20, LINEAR))}px)` })}>
             <div style={{ padding: '22px 22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 22, fontWeight: 500, whiteSpace: 'nowrap' }}>
                 <Tick p={tween(f, at + 10, 22, 0, 1, OUT)} /> {STAGES[i]}

@@ -11,15 +11,15 @@ export const STILL = 700; // the frame shown under reduced motion: everything in
 
 const SQUARE = 83;
 const RAIL_Y = 930;
-const RAIL_L = 120;
-const RAIL_W = W - 240;
-const SEG = RAIL_W / 8;
+const RAIL_L = 0; // no side margin: content touches the site's outer hairlines
+const RAIL_W = W;
+const SEG = (RAIL_W + 10) / 8; // each segment leaves a 10px gap, so the last one ends on the edge
 // Motion, design and build keep moving through the hub: assets drip in while the work carries on.
 const FILL = [[125, 165], [165, 210], [210, 262], [262, 390], [390, 520], [520, 870], [870, 940], [940, 990]];
 
-const TILE = { x: 120, w: 620, y: 236, h: 132, gap: 14 };
+const TILE = { x: 0, w: 700, y: 236, h: 132, gap: 14 };
 const LIST = { x: 860, w: 840, y: 236 };
-const REPLIES = { x: 1820, w: 620, y: 236 };
+const REPLIES = { x: 1860, w: 700, y: 236 };
 const ROW = 64;
 const HUB_IN = 270;
 const HUB_OUT = 730;
@@ -225,7 +225,7 @@ export const View = ({ f, avatar }) => {
   return (
     <div style={{ position: 'absolute', inset: 0, color: T.text, fontFamily: T.sans, fontWeight: 400, fontSize: 16, lineHeight: 'normal', overflow: 'hidden', textAlign: 'left' }}>
       {/* Counter and project header. */}
-      <div style={{ position: 'absolute', left: 120, top: 70, opacity: chrome }}>
+      <div style={{ position: 'absolute', left: RAIL_L, top: 70, opacity: chrome }}>
         <div style={{ ...mono, fontSize: 20, color: T.grey }}>
           Renaissance / Website rebuild
         </div>
@@ -234,7 +234,7 @@ export const View = ({ f, avatar }) => {
           <span style={{ ...mono, fontSize: 20, color: T.grey }}>% complete</span>
         </div>
       </div>
-      <div style={{ position: 'absolute', right: 120, top: 70, textAlign: 'right', opacity: chrome, ...mono, fontSize: 20, color: T.grey }}>
+      <div style={{ position: 'absolute', right: RAIL_L, top: 70, textAlign: 'right', opacity: chrome, ...mono, fontSize: 20, color: T.grey }}>
         <span style={{ color: T.accent }}>Built in 45 days</span> · 20 Jan 2027
       </div>
 
@@ -253,7 +253,7 @@ export const View = ({ f, avatar }) => {
         if (f < at || f > at + 60) return null;
         const e = enterLeave(f, at, at + 28);
         return (
-          <div key={i} style={panel({ left: RAIL_L + i * SEG - 10, top: 700, width: SEG + 40, height: 124, opacity: e.opacity, transform: `translateY(${Math.round(e.y - tween(f, at, 60, 0, 20, LINEAR))}px)` })}>
+          <div key={i} style={panel({ left: RAIL_L + i * SEG, top: 700, width: SEG + 40, height: 124, opacity: e.opacity, transform: `translateY(${Math.round(e.y - tween(f, at, 60, 0, 20, LINEAR))}px)` })}>
             <div style={{ padding: '22px 22px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 23, fontWeight: 500, whiteSpace: 'nowrap' }}>
                 <Tick p={tween(f, at + 10, 22, 0, 1, OUT)} /> {STAGES[i]}
