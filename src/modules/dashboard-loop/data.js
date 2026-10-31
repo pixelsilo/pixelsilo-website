@@ -6,7 +6,7 @@ export const SIGNOFFS = [['Signed off', 'Eleanor Marsh'], ['Approved', 'Daniel O
 
 export const HOOK = ['Built', 'for', 'efficiency', 'and', 'oversight.'];
 export const ANSWER = ['One', 'place.', 'Everyone', 'across', 'it.'];
-export const SUMMARY = 'Everything for the design stage is in and received, including Priya’s feedback on the homepage concept. Build starts Monday.'.split(' ');
+export const SUMMARY = 'Everything we asked for is in and received, including Priya’s feedback on the homepage concept. Build is on track.'.split(' ');
 
 export const PLATFORMS = [
   { icon: 'mail', platform: 'Email', name: 'Eleanor Marsh', initials: 'EM', text: 'Replies to the to-do email' },

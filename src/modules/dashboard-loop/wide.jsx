@@ -14,7 +14,8 @@ const RAIL_Y = 930;
 const RAIL_L = 120;
 const RAIL_W = W - 240;
 const SEG = RAIL_W / 8;
-const FILL = [[125, 165], [165, 210], [210, 262], [275, 330], [650, 720], [730, 890], [890, 940], [940, 990]];
+// Motion, design and build keep moving through the hub: assets drip in while the work carries on.
+const FILL = [[125, 165], [165, 210], [210, 262], [262, 390], [390, 520], [520, 870], [870, 940], [940, 990]];
 
 const TILE = { x: 120, w: 620, y: 236, h: 132, gap: 14 };
 const LIST = { x: 860, w: 840, y: 236 };
