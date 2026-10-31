@@ -208,7 +208,7 @@ export const View = ({ f, avatar }) => {
         </div>
       </div>
       <div style={{ position: 'absolute', right: M, top: 70, textAlign: 'right', opacity: chrome, ...mono, fontSize: 18, color: T.grey, lineHeight: 1.5 }}>
-        <span style={{ color: T.accent }}>Launch in 82 days</span>
+        <span style={{ color: T.accent }}>Built in 45 days</span>
         <br />
         20 Jan 2027
       </div>

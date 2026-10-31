@@ -234,7 +234,7 @@ export const View = ({ f, avatar }) => {
         </div>
       </div>
       <div style={{ position: 'absolute', right: 120, top: 70, textAlign: 'right', opacity: chrome, ...mono, fontSize: 20, color: T.grey }}>
-        <span style={{ color: T.accent }}>Launch in 82 days</span> · 20 Jan 2027
+        <span style={{ color: T.accent }}>Built in 45 days</span> · 20 Jan 2027
       </div>
 
       {/* Hook and answer. */}
