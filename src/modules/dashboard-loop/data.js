@@ -1,7 +1,7 @@
 // The story: one website build for a client called Renaissance, told in frames at 60fps.
 export const FPS = 60;
 
-export const STAGES = ['Discovery call', 'Scope & wireframes', 'Design concepts', 'Motion & CGI', 'High-fidelity design', 'Build', 'Testing & QA', 'Launch & handover'];
+export const STAGES = ['Discovery call', 'Scope & wireframes', 'Design concepts', '3D & film', 'High-fidelity design', 'Build', 'Testing & QA', 'Launch & handover'];
 export const SIGNOFFS = [['Signed off', 'Eleanor Marsh'], ['Approved', 'Daniel Okafor'], ['Approved', 'Eleanor Marsh']];
 
 export const HOOK = ['Built', 'for', 'efficiency', 'and', 'oversight.'];
