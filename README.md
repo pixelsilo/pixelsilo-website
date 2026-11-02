@@ -158,10 +158,9 @@ One element is code by design: the **logo**. It's an inline SVG in an HTML embed
 
 **Studio page** (`/studio`): full-height hero, A note from Luke (two `media.is-headshot` 3:4 portrait slots, still placeholders, and the note), the dashboard (six features beside the themed laptop mockup), Trust (Access, Your data, AI in its lane), Questions (`work-list` FAQ), How we practise (six points), Clients and enquiries. Copy is from the v5 wireframe with CGI changed to imagery.
 
-**Set in the Designer, not the API.** The Data API can't set a Collection List's sort or filter (every write returns a server conflict) or a link to a collection page, so these three are Designer settings:
-1. Work page, the Collection List: Sort by **Order**, ascending (without it the list shows newest first).
-2. Work page, the card's link block (`.card_link`): Link settings, **Collection page**, the current Project.
-3. Case study template, the Next project link (`.next_link`): Link settings, **Collection page**, **Next project**.
+**Set in the Designer, not the API.** With the Webflow Designer and its MCP app open, the API can set a Collection List's sort (the Work list sorts by Order, ascending); without the Designer open, sort and filter writes fail with a server conflict. Links to a collection page can't be set through the API either way (a page link inside a Collection List resolves to `/case-study`, not the item), so these two are done by hand:
+1. Work page, the card's link block (`.card_link`): Link settings, **Collection page**, the current Project.
+2. Case study template, the Next project link (`.next_link`): Link settings, **Collection page**, **Next project**.
 
 ## Grid and hairlines
 
