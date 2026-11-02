@@ -8,6 +8,7 @@ import deferredVideo from './modules/deferred-video.js';
 import mobileMenu from './modules/mobile-menu.js';
 import dashboardLoop from './modules/dashboard-loop/index.js';
 import workFilter from './modules/work-filter.js';
+import filmLightbox from './modules/film-lightbox.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
@@ -20,6 +21,7 @@ const MODULES = {
   'mobile-menu': mobileMenu,
   'dashboard-loop': dashboardLoop,
   'work-filter': workFilter,
+  'film-lightbox': filmLightbox,
 };
 
 function boot() {
