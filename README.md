@@ -104,6 +104,7 @@ Register it in `MODULES` in `src/main.js` (`{ example }`), then give the Webflow
   - `data-hide-empty` hides the element when it has no text.
   - `data-hide-empty-parent=".selector"` hides the closest matching ancestor when this element has no text.
   - `data-hide-if-list-empty` hides the element when the Collection List inside it has no items.
+  - `data-hide-if-no-link=".selector"` (from v1.6.2), on a link, hides the closest matching ancestor when the link has no address. Webflow publishes an empty CMS link field as `href="#"` with no empty marker, so CSS can't catch it. Used on the case study's Live site link (`.cell`), so a project with no live site (Throda) shows no Visit the site link.
 - **`consent-settings`** (`src/global/consent-settings.js`, from v1.2.5) opens the Usercentrics privacy settings from any `[data-consent="settings"]` link or button. If the CMP hasn't loaded, the link falls through to its href, so point the href at the cookie policy.
 - **`consent-skin`** (`src/global/consent-skin.js`, from v1.2.6) brands the Usercentrics UI. See [Consent and analytics](#consent-and-analytics).
 - **`theme-toggle`** (`src/global/theme-toggle.js`, from v1.4.0) switches the whole site between dark and light from any `[data-theme="toggle"]` button.
