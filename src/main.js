@@ -7,6 +7,7 @@ import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
 import mobileMenu from './modules/mobile-menu.js';
 import dashboardLoop from './modules/dashboard-loop/index.js';
+import workFilter from './modules/work-filter.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
@@ -18,6 +19,7 @@ const MODULES = {
   'deferred-video': deferredVideo,
   'mobile-menu': mobileMenu,
   'dashboard-loop': dashboardLoop,
+  'work-filter': workFilter,
 };
 
 function boot() {
