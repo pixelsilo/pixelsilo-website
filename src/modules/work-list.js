@@ -8,6 +8,8 @@
 //   [data-work="panel"]         the panel; .work_panel is height 0, .work_panel.is-open is auto
 //   [data-work="icon"]          the + / − indicator
 //   [data-work="num"]           the row number (accent when open)
+//   [data-work="bg"]            optional full-bleed image behind the row and panel; gets `is-open` (fades in), and
+//                               then the row gets `is-open` too (dark bar) and the item `theme-dark`
 //
 // Optional, on the root, for a list fed by the CMS (where every row starts from the same template):
 //   data-work-number="auto"     writes 01, 02, 03... into each row's number
@@ -25,6 +27,7 @@ export default function (root) {
       panel: el.querySelector('[data-work="panel"]'),
       icon: el.querySelector('[data-work="icon"]'),
       num: el.querySelector('[data-work="num"]'),
+      bg: el.querySelector('[data-work="bg"]'),
     };
     item.panel.id ||= `work-panel-${i + 1}`;
     item.toggle.setAttribute('aria-controls', item.panel.id);
@@ -41,7 +44,13 @@ export default function (root) {
   function setState(item, open, instant = false) {
     if (open === isOpen(item)) return;
     const from = item.panel.offsetHeight;
-    [item.panel, item.icon, item.num].forEach((el) => el?.classList.toggle('is-open', open));
+    [item.panel, item.icon, item.num, item.bg].forEach((el) => el?.classList.toggle('is-open', open));
+    // A project with no hero image bound has only the blank fallback (w-dyn-bind-empty): it stays a plain row
+    if (item.bg && !item.bg.classList.contains('w-dyn-bind-empty')) {
+      // A row with a background image (the homepage list) reads as a dark card whichever theme the page is in
+      item.toggle.classList.toggle('is-open', open);
+      item.el.classList.toggle('theme-dark', open);
+    }
     if (item.icon) item.icon.textContent = open ? '−' : '+';
     item.toggle.setAttribute('aria-expanded', String(open));
     if (!instant) animate(item.panel, from, item.panel.offsetHeight);
