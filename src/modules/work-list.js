@@ -9,7 +9,7 @@
 //   [data-work="icon"]          the + / − indicator
 //   [data-work="num"]           the row number (accent when open)
 //   [data-work="bg"]            optional full-bleed image behind the row and panel; gets `is-open` (fades in), and
-//                               then the row gets `is-open` too (dark bar) and the item `theme-dark`
+//                               then the row gets `is-open` too (tinted title bar)
 //
 // Optional, on the root, for a list fed by the CMS (where every row starts from the same template):
 //   data-work-number="auto"     writes 01, 02, 03... into each row's number
@@ -47,9 +47,8 @@ export default function (root) {
     [item.panel, item.icon, item.num, item.bg].forEach((el) => el?.classList.toggle('is-open', open));
     // A project with no hero image bound has only the blank fallback (w-dyn-bind-empty): it stays a plain row
     if (item.bg && !item.bg.classList.contains('w-dyn-bind-empty')) {
-      // A row with a background image (the homepage list) reads as a dark card whichever theme the page is in
+      // A row with a background image (the homepage list) gets its title bar tint; the CSS follows the page theme
       item.toggle.classList.toggle('is-open', open);
-      item.el.classList.toggle('theme-dark', open);
     }
     if (item.icon) item.icon.textContent = open ? '−' : '+';
     item.toggle.setAttribute('aria-expanded', String(open));
