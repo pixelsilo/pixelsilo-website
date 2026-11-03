@@ -2,6 +2,7 @@ import hideEmpty from './global/hide-empty.js';
 import consentSettings from './global/consent-settings.js';
 import consentSkin from './global/consent-skin.js';
 import themeToggle from './global/theme-toggle.js';
+import thumbVideo from './global/thumb-video.js';
 import workList from './modules/work-list.js';
 import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
@@ -10,9 +11,10 @@ import dashboardLoop from './modules/dashboard-loop/index.js';
 import workFilter from './modules/work-filter.js';
 import filmLightbox from './modules/film-lightbox.js';
 import caseGallery from './modules/case-gallery.js';
+import caseVideo from './modules/case-video.js';
 
-// Site-wide behaviour that runs on every page
-const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
+// Site-wide behaviour that runs on every page (thumb-video before the modules, so work-list finds its loops)
+const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle, thumbVideo];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {
@@ -24,6 +26,7 @@ const MODULES = {
   'work-filter': workFilter,
   'film-lightbox': filmLightbox,
   'case-gallery': caseGallery,
+  'case-video': caseVideo,
 };
 
 function boot() {

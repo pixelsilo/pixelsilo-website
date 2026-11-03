@@ -9,7 +9,8 @@
 //   [data-work="icon"]          the + / − indicator
 //   [data-work="num"]           the row number (accent when open)
 //   [data-work="bg"]            optional full-bleed image behind the row and panel; gets `is-open` (fades in), and
-//                               then the row gets `is-open` too (tinted title bar)
+//                               then the row gets `is-open` too (tinted title bar). A Thumbnail video loop
+//                               (thumb-video) copies the hook, so it fades in with the image
 //
 // Optional, on the root, for a list fed by the CMS (where every row starts from the same template):
 //   data-work-number="auto"     writes 01, 02, 03... into each row's number
@@ -28,6 +29,7 @@ export default function (root) {
       icon: el.querySelector('[data-work="icon"]'),
       num: el.querySelector('[data-work="num"]'),
       bg: el.querySelector('[data-work="bg"]'),
+      bgs: [...el.querySelectorAll('[data-work="bg"]')],
     };
     item.panel.id ||= `work-panel-${i + 1}`;
     item.toggle.setAttribute('aria-controls', item.panel.id);
@@ -44,7 +46,7 @@ export default function (root) {
   function setState(item, open, instant = false) {
     if (open === isOpen(item)) return;
     const from = item.panel.offsetHeight;
-    [item.panel, item.icon, item.num, item.bg].forEach((el) => el?.classList.toggle('is-open', open));
+    [item.panel, item.icon, item.num, ...item.bgs].forEach((el) => el?.classList.toggle('is-open', open));
     // A project with no hero image bound has only the blank fallback (w-dyn-bind-empty): it stays a plain row
     if (item.bg && !item.bg.classList.contains('w-dyn-bind-empty')) {
       // A row with a background image (the homepage list) gets its title bar tint; the CSS follows the page theme
