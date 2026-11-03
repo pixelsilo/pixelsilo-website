@@ -4,9 +4,14 @@
 // it before the first paint, so a saved light theme doesn't flash dark.
 //
 //   data-theme="toggle"   on a <button>: switches the theme; its aria-label says which way
+//
+// While the theme changes, <html> also has `theme-switching`, which the CSS embed uses to turn
+// CSS transitions off. Otherwise an element with a colour transition (the homepage title bar) is
+// still mid-fade when the view transition captures the new state, and jumps when it ends.
 
 const KEY = 'ps-theme';
 const LIGHT = 'theme-light';
+const SWITCHING = 'theme-switching';
 const REDUCED = '(prefers-reduced-motion: reduce)';
 
 export default function themeToggle() {
@@ -34,10 +39,14 @@ export default function themeToggle() {
     } catch (err) {
       // Storage blocked: it still switches, it just won't be remembered
     }
+    html.classList.add(SWITCHING);
+    const done = () => html.classList.remove(SWITCHING);
     if (document.startViewTransition && !window.matchMedia(REDUCED).matches) {
-      document.startViewTransition(() => apply(light));
+      document.startViewTransition(() => apply(light)).finished.finally(done);
     } else {
       apply(light);
+      // Let the new colours paint before transitions come back on
+      requestAnimationFrame(() => requestAnimationFrame(done));
     }
   };
 
