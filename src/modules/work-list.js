@@ -8,6 +8,10 @@
 //   [data-work="panel"]         the panel; .work_panel is height 0, .work_panel.is-open is auto
 //   [data-work="icon"]          the + / − indicator
 //   [data-work="num"]           the row number (accent when open)
+//
+// Optional, on the root, for a list fed by the CMS (where every row starts from the same template):
+//   data-work-number="auto"     writes 01, 02, 03... into each row's number
+//   data-work-open="first"      opens the first row on load, without animating
 
 const DURATION = 500;
 const EASING = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
@@ -34,14 +38,22 @@ export default function (root) {
     panel.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: DURATION, easing: EASING });
   }
 
-  function setState(item, open) {
+  function setState(item, open, instant = false) {
     if (open === isOpen(item)) return;
     const from = item.panel.offsetHeight;
     [item.panel, item.icon, item.num].forEach((el) => el?.classList.toggle('is-open', open));
     if (item.icon) item.icon.textContent = open ? '−' : '+';
     item.toggle.setAttribute('aria-expanded', String(open));
-    animate(item.panel, from, item.panel.offsetHeight);
+    if (!instant) animate(item.panel, from, item.panel.offsetHeight);
   }
+
+  if (root.getAttribute('data-work-number') === 'auto') {
+    items.forEach((item, i) => {
+      const label = item.num?.querySelector('p') || item.num;
+      if (label) label.textContent = String(i + 1).padStart(2, '0');
+    });
+  }
+  if (root.getAttribute('data-work-open') === 'first' && items[0]) setState(items[0], true, true);
 
   function select(target) {
     const opening = !isOpen(target);
