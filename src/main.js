@@ -9,6 +9,7 @@ import mobileMenu from './modules/mobile-menu.js';
 import dashboardLoop from './modules/dashboard-loop/index.js';
 import workFilter from './modules/work-filter.js';
 import filmLightbox from './modules/film-lightbox.js';
+import caseGallery from './modules/case-gallery.js';
 
 // Site-wide behaviour that runs on every page
 const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle];
@@ -22,6 +23,7 @@ const MODULES = {
   'dashboard-loop': dashboardLoop,
   'work-filter': workFilter,
   'film-lightbox': filmLightbox,
+  'case-gallery': caseGallery,
 };
 
 function boot() {

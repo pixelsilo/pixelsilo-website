@@ -6,6 +6,8 @@
 //   data-hide-if-list-empty         hide this element when it holds a collection list with no items
 //   data-hide-if-no-link=".sel"     on a link: hide the closest ancestor matching .sel when the link
 //                                   has no address (an empty CMS link field is published as href="#")
+//   data-hide-if-no-image           hide this element, and a .line-h straight after it, when none of
+//                                   its CMS images has a file (and no [data-images] inside has links)
 //
 // Without JS everything is shown, so empty shapes can appear for an instant before this runs.
 
@@ -32,5 +34,15 @@ export default function hideEmpty() {
     const href = (el.getAttribute('href') || '').trim();
     if (href && href !== '#') return;
     hide(el.closest(el.getAttribute('data-hide-if-no-link')) || el);
+  });
+
+  // An empty CMS image field is published as an <img> with the w-dyn-bind-empty class
+  document.querySelectorAll('[data-hide-if-no-image]').forEach((el) => {
+    const hasImage = el.querySelector('img:not(.w-dyn-bind-empty)')
+      || [...el.querySelectorAll('[data-images]')].some((g) => g.getAttribute('data-images').trim());
+    if (hasImage) return;
+    hide(el);
+    const rule = el.nextElementSibling;
+    if (rule?.classList.contains('line-h')) hide(rule);
   });
 }
