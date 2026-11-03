@@ -12,13 +12,15 @@
 // go two to a row in Gallery order. A pair shares one frame shape (the average of the two) so the
 // hairline under it is straight; a lone image left over takes the full width if it's landscape,
 // otherwise the left half. Shapes come from the smallest responsive size Webflow made of each
-// image, so working them out costs little. With no images the list, and the hairline before it,
-// are removed.
+// image (multi-image fields often have none, so then the image itself). Reading them downloads
+// the images, so it waits until the gallery is about two screens away, as lazy loading would.
+// With no images the list, and the hairline before it, are removed.
 
 const WIDE = 1.9; // width / height at or above which an image gets its own full-width row
 const LANDSCAPE = 1.2; // a lone image at least this wide goes full width rather than half
 const FALLBACK = 1.4; // used if an image's shape can't be read in time
 const TIMEOUT = 4000;
+const AHEAD = '200% 0px'; // start this far before the gallery scrolls into view
 
 const HALF_SIZES = '(max-width: 767px) 100vw, 50vw';
 
@@ -87,15 +89,7 @@ function plan(shots) {
   return rows;
 }
 
-export default async function (root) {
-  const imgs = [...root.querySelectorAll('.w-dyn-item img')].filter((img) => !img.classList.contains('w-dyn-bind-empty'));
-  if (!imgs.length) {
-    const before = root.previousElementSibling;
-    if (before?.classList.contains('line-h')) before.remove();
-    root.remove();
-    return;
-  }
-
+async function layout(root, imgs) {
   const ratios = await Promise.all(imgs.map(ratioOf));
   const rows = plan(imgs.map((img, i) => ({ img, ratio: ratios[i] })));
 
@@ -114,4 +108,24 @@ export default async function (root) {
     built.append(el);
   });
   root.replaceWith(built);
+}
+
+export default function (root) {
+  const imgs = [...root.querySelectorAll('.w-dyn-item img')].filter((img) => !img.classList.contains('w-dyn-bind-empty'));
+  if (!imgs.length) {
+    const before = root.previousElementSibling;
+    if (before?.classList.contains('line-h')) before.remove();
+    root.remove();
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries.some((entry) => entry.isIntersecting)) return;
+      observer.disconnect();
+      layout(root, imgs);
+    },
+    { rootMargin: AHEAD },
+  );
+  observer.observe(root);
 }
