@@ -13,9 +13,17 @@
 // Each image's shape decides its place: wide images (2:1 or wider) take a full-width row, the rest
 // go two to a row in Gallery order. A pair shares one frame shape (the average of the two) so the
 // hairline under it is straight; a lone image left over takes the full width if it's landscape,
-// otherwise the left half. Rows are .row.is-panel.is-spaced (space above and below) and a pair's
-// cells add .is-gutter (a gap either side of the middle line); each row has a hairline after it,
-// like the brief's own rows.
+// otherwise the left half.
+//
+// Each image is framed by its own hairlines, tight to its edges, with a gap between images:
+//   image row   .row.is-panel.is-framed (the page background, so the column lines don't show
+//               through), cells .cell.is-col-*-bleed.is-framed (a hairline each side; a pair's
+//               cells stand 1.25rem off the middle line, so the pair is 2.5rem apart)
+//   gap row     the same row class with empty .is-gap cells (2.5rem tall, same side hairlines),
+//               so the frame lines run on through the gap
+//   .line-h     a full-width hairline above and below every gap row, so where four images meet
+//               the lines box in a small square
+// A block starts straight under the hairline before it and ends with its own hairline.
 //
 // Shapes come from the smallest responsive size Webflow made of each image (multi-image fields
 // often have none, so then the image itself). Reading them downloads the images, so it waits until
@@ -96,21 +104,46 @@ function plan(shots) {
   return rows;
 }
 
-// The rows for some images, each followed by its hairline
+function framedRow() {
+  const el = document.createElement('div');
+  el.className = 'row is-panel is-framed';
+  return el;
+}
+
+// The gap between two rows carries on the frame lines of whichever columns the rows use
+function gapRow(above, below) {
+  const el = framedRow();
+  const halves = [above, below].filter((row) => !row.full);
+  const add = (col) => {
+    const gap = document.createElement('div');
+    gap.className = `cell ${col} is-gap`;
+    el.append(gap);
+  };
+  if (!halves.length) add('is-col-full-bleed');
+  else {
+    add('is-col-1-2-bleed');
+    if (halves.some((row) => row.cells.length > 1)) add('is-col-3-4-bleed');
+  }
+  return el;
+}
+
+// A framed block of rows for some images, ending with its hairline
 function build(shots) {
   const built = document.createDocumentFragment();
-  plan(shots).forEach((row) => {
-    const el = document.createElement('div');
-    el.className = 'row is-panel is-spaced';
+  const rows = plan(shots);
+  rows.forEach((row, i) => {
+    if (i) built.append(rule(), gapRow(rows[i - 1], row), rule());
+    const el = framedRow();
     if (row.full) {
       const [{ img, ratio }] = row.cells;
-      el.append(cell(img, 'is-col-full-bleed', ratio, '100vw'));
+      el.append(cell(img, 'is-col-full-bleed is-framed', ratio, '100vw'));
     } else {
       const shared = row.cells.reduce((sum, c) => sum + c.ratio, 0) / row.cells.length;
-      row.cells.forEach(({ img }, j) => el.append(cell(img, `${j ? 'is-col-3-4-bleed' : 'is-col-1-2-bleed'} is-gutter`, shared, HALF_SIZES)));
+      row.cells.forEach(({ img }, j) => el.append(cell(img, `${j ? 'is-col-3-4-bleed' : 'is-col-1-2-bleed'} is-framed`, shared, HALF_SIZES)));
     }
-    built.append(el, rule());
+    built.append(el);
   });
+  built.append(rule());
   return built;
 }
 
