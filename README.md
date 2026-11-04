@@ -37,6 +37,7 @@ src/
     consent-skin.js
     theme-toggle.js
     cursor.js
+    heading-icon.js
   modules/         # opt-in modules, mounted on [data-module="<name>"]
 lottie/            # Lottie generator: visuals.json (from Figma) -> build.mjs
 public/lottie/     # generated Lottie JSON + SVG posters, copied into dist/lottie
@@ -256,7 +257,7 @@ The style guide page has a live demo of the grid ("05 · Grid and lines").
 - **Open/close lists:** the Work list and the FAQ both use the `work-list` module. FAQ answers sit in `row.is-answer`.
 - **Surfaces:** `section.is-surface` gives the lifted band. `theme-light.is-section` gives the light Studio band, where everything inside flips to paper, hairlines included.
 - **Buttons:** `.button` (solid), `.button.is-outline`, `.button.is-text` and `.button.is-block` (full width), each with `.button_icon` holding a `currentColor` SVG arrow. All have CSS hover states (see Motion). A button in a flex column stretches to the column: `.button.is-outline.is-hug` keeps it to its label.
-- **Heading icon:** `.heading_icon` is an inline `<span>` holding a `currentColor` SVG, sized in em (0.57em × 0.54em, accent) so it scales with whatever heading it sits in. Used for the sparkle before "AI powered dashboard." Keep a real space in the text before it, so the heading reads correctly without the icon.
+- **Heading icon:** `.heading_icon` is an inline `<span>` holding a `currentColor` SVG, sized in em (0.57em × 0.54em, accent) so it scales with whatever heading it sits in. Used for the sparkle before "AI powered dashboard." Keep a real space in the text before it, so the heading reads correctly without the icon. It pops in with the heading's letters: **`heading-icon`** (`src/global/heading-icon.js`, from v1.6.22) hides it (`is-armed`) and, while it's on screen, watches the first split letter after it; the moment Reveal · chars starts fading that letter in, it adds `is-in` and the icon scales up from nothing with a slight overshoot and a quarter turn (the look is in code_css under Heading icon). It keeps time with the interaction whatever its timings, and shows anyway after 4s on screen, under reduced motion, or if the heading isn't split.
 - **Cell gutter:** text sits flush to the left column line but never touches the right one. `.cell` has `padding-right` = **Cell / Gutter**, and `.line-h` has `margin-right` = **Cell / Line bleed** (with `width: auto`), so hairlines inside a cell still run to the line. Both variables are 0 in Base mode; `.cell` switches the Cell collection to **In cell** (2rem / −2rem) and, at small, **In cell (small)** (1.25rem / −1.25rem). `.cell.is-pad` boxes are padded all round already, so they set the collection back to Base. `.line-h.is-stack` (absolute, edge to edge) keeps `margin-right: 0`. Right-aligned content in a cell (the FAQ and work +) is inset by the same gutter. The exceptions, on desktop only, are Enquiries (`.cell.is-nav-end`) and the footer location (`.cell.is-col-4.is-flush`), which sit on the right-hand line; both get the gutter back on tablet down.
 
 ## Motion
