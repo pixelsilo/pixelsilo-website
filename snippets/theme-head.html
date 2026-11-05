@@ -1,2 +1,2 @@
-<!-- Light or dark: applies a saved light theme before the first paint. src/global/theme-toggle.js does the switching. -->
-<script>try{if(localStorage.getItem('ps-theme')==='light')document.documentElement.classList.add('theme-light')}catch(e){}</script>
+<!-- Theme: light, dark or auto, before the first paint. Shared with the dashboard by the `theme` cookie on .pixelsilo.net (localStorage ps-theme where the cookie can't be set, e.g. webflow.io). Nothing saved: dark. src/global/theme-toggle.js does the switching. -->
+<script>(function(){var d=document.documentElement,m=(document.cookie.match(/(?:^|; )theme=(light|dark|auto)(?:;|$)/)||[])[1];try{m=m||localStorage.getItem('ps-theme')}catch(e){}if(m!=='light'&&m!=='auto')m='dark';d.setAttribute('data-theme-mode',m);if(m==='light'||(m==='auto'&&matchMedia('(prefers-color-scheme: light)').matches))d.classList.add('theme-light')})()</script>
