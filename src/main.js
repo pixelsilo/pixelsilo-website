@@ -15,6 +15,7 @@ import workFilter from './modules/work-filter.js';
 import filmLightbox from './modules/film-lightbox.js';
 import caseGallery from './modules/case-gallery.js';
 import caseVideo from './modules/case-video.js';
+import caseMotion from './modules/case-motion.js';
 
 // Site-wide behaviour that runs on every page (thumb-video before the modules, so work-list finds its loops)
 const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon];
@@ -30,6 +31,7 @@ const MODULES = {
   'film-lightbox': filmLightbox,
   'case-gallery': caseGallery,
   'case-video': caseVideo,
+  'case-motion': caseMotion,
 };
 
 function boot() {

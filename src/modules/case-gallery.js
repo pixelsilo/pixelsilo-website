@@ -30,6 +30,8 @@
 // the lead slot is about two screens away, as lazy loading would. With no images the list and the
 // slot are removed.
 
+import { unveil } from './image-unveil.js';
+
 const WIDE = 1.9; // width / height at or above which an image gets its own full-width row
 const LANDSCAPE = 1.2; // a lone image at least this wide goes full width rather than half
 const FALLBACK = 1.4; // used if an image's shape can't be read in time
@@ -152,9 +154,16 @@ async function layout(root, slot, imgs) {
   const shots = imgs.map((img, i) => ({ img, ratio: ratios[i] }));
   const lead = slot ? shots.slice(0, LEAD) : [];
   const rest = shots.slice(lead.length);
-  if (slot) slot.replaceWith(build(lead));
-  if (rest.length) root.replaceWith(build(rest));
+  const frames = [];
+  const place = (target, list) => {
+    const block = build(list);
+    frames.push(...block.querySelectorAll('.media'));
+    target.replaceWith(block);
+  };
+  if (slot) place(slot, lead);
+  if (rest.length) place(root, rest);
   else root.remove();
+  unveil(frames); // each frame lifts open as it scrolls in (image-unveil)
 }
 
 export default function (root) {
