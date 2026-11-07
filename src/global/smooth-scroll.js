@@ -12,11 +12,13 @@
 //   anchors            same-page links (#id) glide to their target
 //
 // Feel: LERP is how much of the distance left is covered each frame. Lower is floatier; 0.1 is
-// Lenis's default, this sits a little closer to native.
+// Lenis's default. Each notch of a clicky mouse wheel starts a new glide, and above about 0.1 each
+// glide is mostly over before the next notch, so the notches show as steps (0.12 did, 7 Nov 2026).
+// Lower runs the notches together into one continuous movement.
 
 import Lenis from 'lenis';
 
-const LERP = 0.12;
+const LERP = 0.075;
 const REDUCED = '(prefers-reduced-motion: reduce)';
 const STYLE_ID = 'lenis-style';
 
