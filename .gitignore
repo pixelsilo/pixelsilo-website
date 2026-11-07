@@ -3,3 +3,4 @@ node_modules/
 .DS_Store
 .dev.vars
 lottie/preview.html
+.env.local

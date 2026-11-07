@@ -1,6 +1,6 @@
 import hideEmpty from './global/hide-empty.js';
-import consentSettings from './global/consent-settings.js';
-import consentSkin from './global/consent-skin.js';
+import consent from './global/consent.js';
+import enquiryEvent from './global/enquiry-event.js';
 import themeToggle from './global/theme-toggle.js';
 import thumbVideo from './global/thumb-video.js';
 import marqueeEager from './global/marquee-eager.js';
@@ -18,7 +18,7 @@ import caseVideo from './modules/case-video.js';
 import caseMotion from './modules/case-motion.js';
 
 // Site-wide behaviour that runs on every page (thumb-video before the modules, so work-list finds its loops)
-const GLOBALS = [hideEmpty, consentSettings, consentSkin, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon];
+const GLOBALS = [hideEmpty, consent, enquiryEvent, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {
