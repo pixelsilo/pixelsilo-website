@@ -4,7 +4,7 @@
 //   email_click     a mailto: link was clicked
 //   phone_click     a tel: link was clicked
 //   whatsapp_click  a WhatsApp link (/whatsapp) was clicked
-//   email_copy      an email address was copied from the page
+//   email_copy      an email address was copied from the page, by hand or with a copy button
 //   phone_copy      a phone number was copied from the page
 //
 // Mark the ones that count as an enquiry as key events in GA4 (Admin > Events). In Clarity the same
@@ -24,7 +24,7 @@ const PHONE = /(\+|\b0)[\d\s().-]{8,}\d/; // a UK or international number: start
 const WHATSAPP = 'a[href="/whatsapp"], a[href*="wa.me/"], a[href*="api.whatsapp.com"]';
 const FIELDS ={ user: 'Clarity user', session: 'Clarity session' };
 
-function track(name, params = {}) {
+export function track(name, params = {}) {
   window.gtag?.('event', name, params);
   window.clarity?.('event', name);
 }
