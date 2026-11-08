@@ -3,6 +3,7 @@
 //   generate_lead   the enquiry form was sent (Webflow showed its success message)
 //   email_click     a mailto: link was clicked
 //   phone_click     a tel: link was clicked
+//   whatsapp_click  a WhatsApp link (/whatsapp) was clicked
 //   email_copy      an email address was copied from the page
 //   phone_copy      a phone number was copied from the page
 //
@@ -19,7 +20,9 @@
 
 const EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/;
 const PHONE = /(\+|\b0)[\d\s().-]{8,}\d/; // a UK or international number: starts 0 or +, at least ten digits-ish
-const FIELDS = { user: 'Clarity user', session: 'Clarity session' };
+// The site links to /whatsapp, a Webflow 301 redirect to wa.me, so the number isn't in the page
+const WHATSAPP = 'a[href="/whatsapp"], a[href*="wa.me/"], a[href*="api.whatsapp.com"]';
+const FIELDS ={ user: 'Clarity user', session: 'Clarity session' };
 
 function track(name, params = {}) {
   window.gtag?.('event', name, params);
@@ -73,8 +76,12 @@ function forms() {
 
 function links() {
   document.addEventListener('click', (e) => {
-    const link = e.target.closest?.('a[href^="mailto:"], a[href^="tel:"]');
+    const link = e.target.closest?.(`a[href^="mailto:"], a[href^="tel:"], ${WHATSAPP}`);
     if (!link) return;
+    if (link.matches(WHATSAPP)) {
+      track('whatsapp_click');
+      return;
+    }
     const href = link.getAttribute('href');
     const email = href.startsWith('mailto:');
     track(email ? 'email_click' : 'phone_click', {
