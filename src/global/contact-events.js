@@ -12,7 +12,8 @@
 //
 // The enquiry form also gets two hidden fields, Clarity user and Clarity session, filled from Clarity's
 // metadata callback, so each submission in Webflow says which recording it came from (search Clarity
-// recordings by user ID). They are added here rather than in the Designer and fill on page load and
+// recordings by user ID). A third, Referred by, carries the code from an introduction link
+// (/contact?ref=<code>), and is only added when the link has one. They are added here rather than in the Designer and fill on page load and
 // again when someone starts filling in the form, in case analytics was accepted after the page loaded.
 //
 // Both tools only exist after a yes to analytics (snippets/consent-head.html). Without it gtag queues
@@ -22,7 +23,9 @@ const EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/;
 const PHONE = /(\+|\b0)[\d\s().-]{8,}\d/; // a UK or international number: starts 0 or +, at least ten digits-ish
 // The site links to /whatsapp, a Webflow 301 redirect to wa.me, so the number isn't in the page
 const WHATSAPP = 'a[href="/whatsapp"], a[href*="wa.me/"], a[href*="api.whatsapp.com"]';
-const FIELDS ={ user: 'Clarity user', session: 'Clarity session' };
+const FIELDS ={ user: 'Clarity user', session: 'Clarity session', ref: 'Referred by' };
+// Introduction links (docs/referral-scheme.md): /contact?ref=<code>, matched to a client or introducer in the dashboard
+const REF = /^[a-z0-9-]{3,32}$/;
 
 export function track(name, params = {}) {
   window.gtag?.('event', name, params);
@@ -62,6 +65,10 @@ function forms() {
     const session = hiddenField(form, FIELDS.session);
     fillClarity(user, session);
     form.addEventListener('focusin', () => fillClarity(user, session));
+
+    // Read from the URL only, never stored, so no consent is needed
+    const ref = (new URLSearchParams(location.search).get('ref') || '').trim().toLowerCase();
+    if (REF.test(ref)) hiddenField(form, FIELDS.ref).value = ref;
 
     // Webflow has no submit-success callback, so watch the .w-form-done block it reveals
     if (!done) return;
