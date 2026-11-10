@@ -23,11 +23,13 @@ Say "introduce someone" or "introductions". Never "referral programme", "affilia
 
 ## Referral links
 
-Link format: `https://www.pixelsilo.net/contact?ref=<code>`
+Link format: `https://www.pixelsilo.net/contact?ref=<code>&from=<name>`
 
 - `code`: lowercase letters, digits and hyphens, 3 to 32 characters (for example `regenta` or `smith-pr`). The dashboard owns the codes.
 - The website reads `ref` from the contact page URL and sends it with the enquiry form as a hidden field named **Referred by**. Nothing is stored in the browser, so no consent is needed: the link goes straight to the contact page.
 - The dashboard matches the code to a client or introducer and logs the introduction.
+- `from` (added 10 Nov 2026): who sent them, as it should read on the page: the client's site name, or an introducer's company (else their own name). The dashboard adds it to every link it shows. Links without it still work, and the page says "Someone".
+- With a valid code the contact page shows an Introduction strip at the top of the enquiry form ("{name} sent you our way…", editable in the Designer: `[data-intro="strip"]`, shown with `.is-visible`), gives every email link the subject "Introduced by {name}", and points the WhatsApp link at `/whatsapp/<message>` with "Hi, {name} introduced me to PIXEL SILO." That needs a second Webflow redirect: `/whatsapp/(.*)` to `https://wa.me/<number>?text=%1`. Code: `src/global/introduction.js`.
 
 ## Built where
 
