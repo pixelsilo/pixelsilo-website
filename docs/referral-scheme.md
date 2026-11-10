@@ -4,10 +4,10 @@ Agreed with Luke on 10 Nov 2026. Most PIXEL SILO work already comes through intr
 
 ## The rewards
 
-**Clients (current or past):** when someone they introduce signs and pays their first invoice, the client gets **one month of Adapt free**.
+**Clients (current or past):** when someone they introduce signs and pays their first invoice, the client gets **free studio time on Adapt** (changed 10 Nov 2026; it was a flat month of Adapt).
 
-- Already on Adapt: their next month is free.
-- Not on Adapt: one month of Adapt, sized to their site the way any plan is sized. It sits outside the three month minimum; afterwards they choose whether to carry on. It is a taste of the plan, not month one of three.
+- Luke sets the hours for each introduction. A guide only: 10% of the new client's first project, at £100 an hour.
+- Clients are never told an amount or how it's worked out, so nobody can work out another client's spend. Dashboard wording: "we'll add free time to your Adapt plan, based on the size of their first project".
 
 **Introducers** (PR firms, brand consultancies, advisers, anyone with no site of ours): **10% of the first project's fee**, paid once, after the new client has paid that project in full. First project only; nothing on Adapt or later work.
 
