@@ -11,8 +11,9 @@
 //     .is-down          a button is held
 //     .is-text          over a text field, where the caret shows instead
 //
-// A modal <dialog> (the Work page lightbox) and a full-screen film sit in the browser's top layer,
-// above everything else, so the dot moves into whichever is open to stay on top.
+// A modal <dialog> (the Work page lightbox), an open popover (the Hello pages' AEO explainer) and a
+// full-screen film sit in the browser's top layer, above everything else, so the dot moves into
+// whichever is open to stay on top.
 
 const FINE = '(hover: hover) and (pointer: fine)';
 const CLICKABLE = 'a[href], button, [role="button"], label, select, summary, [data-film-open], [data-player="track"], [tabindex]:not([tabindex="-1"])';
@@ -23,7 +24,14 @@ export default function cursor() {
   const html = document.documentElement;
   let dot = null;
 
-  const home = () => document.fullscreenElement || document.querySelector('dialog[open]') || document.body;
+  const openPopover = () => {
+    try {
+      return document.querySelector(':popover-open');
+    } catch {
+      return null; // a browser without popovers has none open
+    }
+  };
+  const home = () => document.fullscreenElement || document.querySelector('dialog[open]') || openPopover() || document.body;
   const rehome = () => {
     const parent = home();
     if (dot && dot.parentElement !== parent) parent.append(dot);
@@ -64,6 +72,8 @@ export default function cursor() {
     window.addEventListener('pointerup', up, { passive: true });
     html.addEventListener('mouseleave', leave);
     document.addEventListener('fullscreenchange', rehome);
+    // A popover's toggle event doesn't bubble, so listen in the capture phase
+    document.addEventListener('toggle', rehome, true);
   }
 
   function disable() {
@@ -74,6 +84,7 @@ export default function cursor() {
     window.removeEventListener('pointerup', up);
     html.removeEventListener('mouseleave', leave);
     document.removeEventListener('fullscreenchange', rehome);
+    document.removeEventListener('toggle', rehome, true);
     html.classList.remove('has-cursor');
     dot.remove();
     dot = null;
