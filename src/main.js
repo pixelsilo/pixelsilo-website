@@ -9,6 +9,7 @@ import marqueeEager from './global/marquee-eager.js';
 import cursor from './global/cursor.js';
 import headingIcon from './global/heading-icon.js';
 import smoothScroll from './global/smooth-scroll.js';
+import countUp from './global/count-up.js';
 import workList from './modules/work-list.js';
 import lottieStagger from './modules/lottie-stagger.js';
 import deferredVideo from './modules/deferred-video.js';
@@ -21,7 +22,7 @@ import caseVideo from './modules/case-video.js';
 import caseMotion from './modules/case-motion.js';
 
 // Site-wide behaviour that runs on every page (thumb-video before the modules, so work-list finds its loops)
-const GLOBALS = [hideEmpty, consent, contactEvents, introduction, copyButton, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon, smoothScroll];
+const GLOBALS = [hideEmpty, consent, contactEvents, introduction, copyButton, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon, smoothScroll, countUp];
 
 // Opt-in modules, mounted on [data-module="<name>"] roots
 const MODULES = {
