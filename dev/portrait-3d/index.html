@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portrait 3D test</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root { --bg:#0b0b0c; --text:#f2f1ee; --muted:#8a8a8e; --line:#232324; --accent:#ff5b1f; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font-family:Geist, Arial, sans-serif; }
+  .spacer { height:110vh; display:grid; place-items:center; color:var(--muted); font:500 0.75rem "Geist Mono", monospace; letter-spacing:0.04em; text-transform:uppercase; }
+  .row { display:grid; grid-template-columns:repeat(4, 1fr); border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0 2rem; }
+  .media { grid-column:1 / span 2; position:relative; aspect-ratio:1; overflow:hidden; background:#1a1a1b; }
+  .media canvas, .media img { position:absolute; inset:0; width:100%; height:100%; display:block; }
+  .media img { object-fit:cover; opacity:0; transition:opacity .2s; }
+  .media.show-still img { opacity:1; }
+  .note { grid-column:3 / span 2; padding:2rem 0 2rem 2rem; color:var(--muted); line-height:1.5; }
+  .note h2 { color:var(--text); font-weight:500; font-size:2rem; margin:0 0 1rem; }
+  @media (max-width: 767px) { .row { padding:0 1rem; } .media, .note { grid-column:1 / -1; } .note { padding:1.5rem 0; } }
+
+  .ui { position:fixed; top:1rem; right:1rem; z-index:9; width:16rem; padding:1rem; background:rgba(20,20,22,.92); border:1px solid #333;
+        font:400 0.75rem "Geist Mono", monospace; color:var(--text); }
+  .ui label { display:grid; grid-template-columns:1fr auto; gap:0.25rem 0.5rem; margin-bottom:0.6rem; }
+  .ui input[type=range] { grid-column:1 / -1; width:100%; accent-color:var(--accent); }
+  .ui .flags label { display:flex; gap:0.5rem; align-items:center; }
+  .ui .p { color:var(--muted); margin-top:0.5rem; }
+  .ui.hide > :not(button) { display:none; }
+  .ui button { all:unset; cursor:pointer; color:var(--muted); float:right; }
+</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js" } }</script>
+</head>
+<body>
+
+<div class="spacer">Scroll</div>
+<section class="row">
+  <div class="media" id="media">
+    <img src="src/luke-portrait.webp" alt="">
+  </div>
+  <div class="note">
+    <h2>The studio</h2>
+    <p>The photo is mapped onto a rough 3D model of the field: the ground as a plane running back to the horizon, the fog and trees on a card far off, and Luke on a cut-out card where he stands. The camera orbits a little as the section scrolls past, so the ground turns under his feet while the distance barely moves.</p>
+    <p>At the middle of the scroll the camera sits exactly where the photo was taken, so the frame matches the still.</p>
+  </div>
+</section>
+<div class="spacer">End</div>
+
+<div class="ui" id="ui">
+  <button id="hide">hide</button>
+  <label>orbit (deg) <span data-out="yaw"></span><input type="range" id="yaw" min="0" max="8" step="0.1" value="3"></label>
+  <label>pivot distance (m) <span data-out="pivot"></span><input type="range" id="pivot" min="5" max="40" step="0.5" value="7"></label>
+  <label>rise (m) <span data-out="rise"></span><input type="range" id="rise" min="0" max="1" step="0.01" value="0.25"></label>
+  <label>dolly zoom (m) <span data-out="dolly"></span><input type="range" id="dolly" min="0" max="3" step="0.05" value="0.8"></label>
+  <label>lens (vertical deg) <span data-out="fov"></span><input type="range" id="fov" min="10" max="40" step="0.5" value="22"></label>
+  <label>overscan <span data-out="over"></span><input type="range" id="over" min="1" max="1.3" step="0.01" value="1.06"></label>
+  <div class="flags">
+    <label><input type="checkbox" id="still"> show the still</label>
+    <label><input type="checkbox" id="wire"> show the geometry</label>
+    <label><input type="checkbox" id="scrub"> drive by slider, not scroll</label>
+  </div>
+  <label>progress <span data-out="prog"></span><input type="range" id="prog" min="0" max="1" step="0.001" value="0.5"></label>
+  <div class="p">0 = section entering the bottom, 0.5 = centred (matches the still), 1 = leaving the top.</div>
+</div>
+
+<script type="module">
+import * as THREE from "three";
+
+// Measured on the 1600px portrait (see prep.py / src/dof.py)
+const IMG = 1600, HORIZON_Y = 483, FEET_Y = 1490;     // px from the top
+const PERSON = { x0: 566, x1: 1112, y0: 78, y1: 1440 }; // card bounds, px
+const CAM_H = 1.35;   // the camera sat about at his chest: the horizon crosses him there
+const FAR = 250;      // the fog card
+
+const media = document.getElementById("media");
+const $ = (id) => document.getElementById(id);
+const P = {};
+const read = () => {
+  for (const k of ["yaw", "pivot", "rise", "dolly", "fov", "over", "prog"]) {
+    P[k] = parseFloat($(k).value);
+    const o = document.querySelector(`[data-out=${k}]`); if (o) o.textContent = P[k];
+  }
+};
+read();
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+media.prepend(renderer.domElement);
+
+const loader = new THREE.TextureLoader();
+const tex = (url) => { const t = loader.load(url, () => { ready++; }); t.colorSpace = THREE.SRGBColorSpace;
+  t.wrapS = t.wrapT = THREE.MirroredRepeatWrapping; t.anisotropy = 8; t.generateMipmaps = true; return t; };
+let ready = 0;
+const plateTex = tex("plate.webp"), personTex = tex("person.webp");
+personTex.wrapS = personTex.wrapT = THREE.ClampToEdgeWrapping;
+
+const scene = new THREE.Scene();
+const projector = new THREE.PerspectiveCamera(22, 1, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(22, 1, 0.1, 1000);
+const projMat = new THREE.Matrix4();
+
+const projVert = /* glsl */`
+  uniform mat4 uProj; varying vec4 vP;
+  void main() { vec4 w = modelMatrix * vec4(position, 1.0); vP = uProj * w; gl_Position = projectionMatrix * viewMatrix * w; }`;
+const mat = (map, cut) => new THREE.ShaderMaterial({
+  uniforms: { uMap: { value: map }, uProj: { value: projMat } },
+  vertexShader: projVert,
+  fragmentShader: /* glsl */`
+    uniform sampler2D uMap; varying vec4 vP;
+    void main() {
+      vec2 uv = vP.xy / vP.w * 0.5 + 0.5;
+      vec4 c = texture2D(uMap, uv);
+      ${cut ? "if (c.a < 0.01) discard;" : "c.a = 1.0;"}
+      gl_FragColor = c;
+      #include <colorspace_fragment>
+    }`,
+  transparent: !!cut, depthWrite: !cut,
+});
+
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(2 * FAR, FAR, 1, 1), mat(plateTex));
+ground.rotation.x = -Math.PI / 2; ground.position.set(0, 0, -FAR / 2);
+const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(4 * FAR, 2 * FAR), mat(plateTex));
+backdrop.position.set(0, FAR, -FAR);
+const card = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), mat(personTex, true));
+card.renderOrder = 1;
+scene.add(ground, backdrop, card);
+
+const wire = new THREE.Group(); scene.add(wire); wire.visible = false;
+const addWire = (m) => { const w = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry), new THREE.LineBasicMaterial({ color: 0xff5b1f }));
+  w.position.copy(m.position); w.rotation.copy(m.rotation); w.scale.copy(m.scale); wire.add(w); return w; };
+const grid = new THREE.GridHelper(60, 60, 0xff5b1f, 0x884422); grid.position.set(0, 0.002, -30); wire.add(grid);
+
+// Rebuild the original camera from the lens: pitch from the horizon, distance from his feet.
+let T = new THREE.Vector3(), cardWire;
+function setupScene() {
+  const f = (IMG / 2) / Math.tan(THREE.MathUtils.degToRad(P.fov / 2));
+  const pitch = Math.atan((IMG / 2 - HORIZON_Y) / f);
+  projector.fov = P.fov; projector.position.set(0, CAM_H, 0);
+  projector.rotation.set(-pitch, 0, 0); projector.updateProjectionMatrix(); projector.updateMatrixWorld();
+  projMat.multiplyMatrices(projector.projectionMatrix, projector.matrixWorldInverse);
+
+  // where a pixel's ray meets the vertical plane z = -d
+  const feetAngle = pitch + Math.atan((FEET_Y - IMG / 2) / f);
+  const d = CAM_H / Math.tan(feetAngle);
+  const hit = (px, py) => {
+    const v = new THREE.Vector3((px / IMG) * 2 - 1, 1 - (py / IMG) * 2, 0.5).unproject(projector).sub(projector.position);
+    return projector.position.clone().addScaledVector(v, -d / v.z);
+  };
+  const a = hit(PERSON.x0, PERSON.y0), b = hit(PERSON.x1, PERSON.y1);
+  card.position.set((a.x + b.x) / 2, (a.y + b.y) / 2, -d);
+  card.scale.set(b.x - a.x, a.y - b.y, 1);
+  T.set(card.position.x, 1.2, -d);
+  if (cardWire) wire.remove(cardWire);
+  cardWire = addWire(card);
+  return { d };
+}
+let geo = setupScene();
+addWire(backdrop);
+
+function size() {
+  const r = media.getBoundingClientRect();
+  renderer.setSize(r.width, r.height, false);
+}
+addEventListener("resize", size); size();
+
+function progress() {
+  if ($("scrub").checked) return P.prog;
+  const r = media.getBoundingClientRect();
+  const p = (innerHeight - r.top) / (innerHeight + r.height);
+  return Math.min(1, Math.max(0, p));
+}
+
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const up = new THREE.Vector3(0, 1, 0), side = new THREE.Vector3();
+let smooth = 0.5;
+
+function frame() {
+  requestAnimationFrame(frame);
+  if (ready < 2) return;
+  const target = reduced ? 0.5 : progress();
+  smooth += (target - smooth) * 0.12;
+  if (!$("scrub").checked) { $("prog").value = smooth.toFixed(3); document.querySelector("[data-out=prog]").textContent = smooth.toFixed(3); }
+  const s = smooth * 2 - 1; // -1 .. 1, 0 = the still
+
+  // 1) orbit about a point on the line of sight, `pivot` metres away
+  const fwd = new THREE.Vector3(0, 0, -1).applyQuaternion(projector.quaternion);
+  const pivot = projector.position.clone().addScaledVector(fwd, P.pivot);
+  const q = new THREE.Quaternion().setFromAxisAngle(up, THREE.MathUtils.degToRad(-P.yaw * s));
+  camera.position.copy(projector.position).sub(pivot).applyQuaternion(q).add(pivot);
+  camera.quaternion.copy(q).multiply(projector.quaternion);
+  const aim = T.clone().sub(camera.position).normalize();
+  // 2) rise as it goes (down low on the way in, up high on the way out)
+  camera.position.y += P.rise * s;
+  // 3) dolly zoom: push in towards Luke on the way out, widening the lens so he stays the same size
+  const dist = camera.position.distanceTo(T);
+  const push = P.dolly * s;
+  camera.position.addScaledVector(T.clone().sub(camera.position).normalize(), push);
+  const fov0 = THREE.MathUtils.degToRad(P.fov / P.over);
+  camera.fov = THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(fov0 / 2) * dist / (dist - push)));
+  // turn the camera so Luke's chest stays where the orbit left it in frame
+  const fix = new THREE.Quaternion().setFromUnitVectors(aim, T.clone().sub(camera.position).normalize());
+  camera.quaternion.premultiply(fix);
+  camera.updateProjectionMatrix();
+
+  renderer.render(scene, camera);
+}
+frame();
+
+for (const el of document.querySelectorAll(".ui input")) el.addEventListener("input", () => {
+  read();
+  if (el.id === "fov") geo = setupScene();
+  wire.visible = $("wire").checked;
+  media.classList.toggle("show-still", $("still").checked);
+});
+$("hide").onclick = () => $("ui").classList.toggle("hide");
+</script>
+</body>
+</html>
