@@ -108,7 +108,7 @@ export default function (root) {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
   const canvas = document.createElement('canvas');
-  const gl = canvas.getContext('webgl2', { alpha: false, antialias: true, premultipliedAlpha: false });
+  const gl = canvas.getContext('webgl2', { alpha: false, antialias: false, premultipliedAlpha: false, powerPreference: 'low-power' });
   if (!gl) return;
 
   const num = (name, fb) => {
@@ -179,16 +179,34 @@ export default function (root) {
   };
 
   let plateTex, personTex, last = -1, raf = 0, visible = false;
+  // Geometry is measured once and on resize, never while scrolling: reading layout or computed
+  // style every frame forces the browser to recalculate mid-frame while Lenis and the reveals run.
+  let docTop = 0, boxH = 1, viewH = window.innerHeight, crop = [0, 0, 1, 1];
+  const U_ = {};
+  for (const n of ['uCam', 'uR', 'uU', 'uF', 'uFn', 'uCrop', 'uCut']) U_[n] = u(n);
 
   Object.assign(canvas.style, { position: 'absolute', inset: '0', width: '100%', height: '100%', display: 'block', opacity: '0', transition: 'opacity 0.6s ease', pointerEvents: 'none' });
   canvas.setAttribute('aria-hidden', 'true');
   if (getComputedStyle(root).position === 'static') root.style.position = 'relative';
 
-  function size() {
+  function measure() {
     const r = root.getBoundingClientRect();
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = Math.max(1, Math.round(r.width * dpr));
-    canvas.height = Math.max(1, Math.round(r.height * dpr));
+    docTop = r.top + window.scrollY;
+    boxH = r.height || 1;
+    viewH = window.innerHeight;
+    // Up to 1.5x pixel density and about 2 million pixels: the photo is soft and grainy, so more
+    // only costs GPU time on every scroll frame.
+    let dpr = Math.min(window.devicePixelRatio || 1, 1.5);
+    const cap = Math.sqrt(2.0e6 / Math.max(1, r.width * r.height));
+    dpr = Math.min(dpr, cap);
+    const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+    if (canvas.width !== w || canvas.height !== h) { canvas.width = w; canvas.height = h; }
+    // the still's crop: object-fit cover at its object-position
+    const [ox, oy] = objectPosition(still);
+    let x0 = 0, x1 = 1, y0 = 0, y1 = 1;
+    if (w / h > 1) { const vh = h / w; const top = (1 - vh) * oy; y1 = 1 - top; y0 = y1 - vh; }
+    else { const vw = w / h; x0 = (1 - vw) * ox; x1 = x0 + vw; }
+    crop = [x0, y0, x1, y1];
     last = -1;
   }
 
@@ -210,40 +228,39 @@ export default function (root) {
     R = turn(R, aim, aim2); U = turn(U, aim, aim2); F = turn(F, aim, aim2);
     const camFn = fn * ((dist - push) / dist) * (1 + OVERSCAN * Math.abs(s));
 
-    // the still's crop: object-fit cover at its object-position
-    const w = canvas.width, h = canvas.height, [ox, oy] = objectPosition(still);
-    let x0 = 0, x1 = 1, y0 = 0, y1 = 1;
-    if (w / h > 1) { const vh = h / w; const top = (1 - vh) * oy; y1 = 1 - top; y0 = y1 - vh; }
-    else { const vw = w / h; x0 = (1 - vw) * ox; x1 = x0 + vw; }
-
-    gl.viewport(0, 0, w, h);
-    gl.uniform3fv(u('uCam'), C); gl.uniform3fv(u('uR'), R); gl.uniform3fv(u('uU'), U); gl.uniform3fv(u('uF'), F);
-    gl.uniform1f(u('uFn'), camFn);
-    gl.uniform4f(u('uCrop'), x0, y0, x1, y1);
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.uniform3fv(U_.uCam, C); gl.uniform3fv(U_.uR, R); gl.uniform3fv(U_.uU, U); gl.uniform3fv(U_.uF, F);
+    gl.uniform1f(U_.uFn, camFn);
+    gl.uniform4f(U_.uCrop, crop[0], crop[1], crop[2], crop[3]);
 
     gl.disable(gl.BLEND);
-    gl.uniform1i(u('uCut'), 0);
+    gl.uniform1i(U_.uCut, 0);
     gl.bindTexture(gl.TEXTURE_2D, plateTex);
     gl.drawArrays(gl.TRIANGLES, 0, 12);
     gl.enable(gl.BLEND);
-    gl.uniform1i(u('uCut'), 1);
+    gl.uniform1i(U_.uCut, 1);
     gl.bindTexture(gl.TEXTURE_2D, personTex);
     gl.drawArrays(gl.TRIANGLES, 12, 6);
   }
 
+  // from cached geometry and the scroll position alone: no layout read
   function progress() {
-    const r = root.getBoundingClientRect();
-    const p = (window.innerHeight - r.top) / (window.innerHeight + r.height);
-    return Math.min(1, Math.max(0, p));
+    const top = docTop - window.scrollY;
+    return Math.min(1, Math.max(0, (viewH - top) / (viewH + boxH)));
   }
 
-  function tick() {
-    raf = visible ? requestAnimationFrame(tick) : 0;
+  // Draw only when something asks: a scroll, a resize, or coming on screen. Lenis's scroll event
+  // fires inside its frame, right after it moves the page, so drawing there keeps the canvas in
+  // step with the page; anything else waits for the next frame, once.
+  function frame() {
+    raf = 0;
+    if (!plateTex || !visible) return;
     const p = Math.round(progress() * 2000) / 2000;
     if (p === last) return;
     last = p;
     draw(p);
   }
+  const request = () => { if (!raf) raf = requestAnimationFrame(frame); };
 
   let started = false;
   async function start() {
@@ -261,17 +278,23 @@ export default function (root) {
       return;
     }
     still.after(canvas);
-    size();
-    new ResizeObserver(() => { size(); if (!raf) tick(); }).observe(root);
+    measure();
     draw((last = progress()));
     requestAnimationFrame(() => { canvas.style.opacity = '1'; });
-    if (visible && !raf) tick();
+
+    // remeasure when the portrait or anything above it changes size (the work list opening, fonts)
+    const ro = new ResizeObserver(() => { measure(); request(); });
+    ro.observe(root);
+    ro.observe(document.body);
+    window.addEventListener('resize', () => { measure(); request(); });
+    if (window.lenis?.on) window.lenis.on('scroll', frame);
+    else window.addEventListener('scroll', request, { passive: true });
   }
 
-  // load a screen ahead; only run the loop while it's on screen
+  // load a screen ahead; only draw while it's on screen
   new IntersectionObserver(([e]) => { if (e.isIntersecting) start(); }, { rootMargin: '100% 0px' }).observe(root);
   new IntersectionObserver(([e]) => {
     visible = e.isIntersecting;
-    if (visible && plateTex && !raf) tick();
+    if (visible && plateTex) { measure(); request(); }
   }).observe(root);
 }
