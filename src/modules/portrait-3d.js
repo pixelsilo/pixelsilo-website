@@ -13,10 +13,10 @@
  * sets the crop: the canvas copies its object-fit: cover and object-position.
  *
  * Optional attributes (defaults in brackets):
- *   data-orbit  degrees the camera circles either side [3]
+ *   data-orbit  degrees the camera circles either side [1.5]
  *   data-pivot  metres from the camera to the point it circles [7]
- *   data-rise   metres the camera climbs either side [0.25]
- *   data-dolly  metres of dolly zoom either side [0.8]
+ *   data-rise   metres the camera climbs either side [0.125]
+ *   data-dolly  metres of dolly zoom either side [0.4]
  *   data-plate / data-person  image URLs [dist/portrait-3d/*.webp on jsDelivr]
  *
  * The layers are made by dev/portrait-3d/prep.py; the scene was tuned in
@@ -31,7 +31,7 @@ const PERSON = { x0: 566, x1: 1112, y0: 78, y1: 1440 };
 const LENS = 22;      // vertical degrees; with the horizon and feet it fixes the scene
 const CAM_H = 1.35;   // the camera sat at his chest: the horizon crosses him there
 const FAR = 250;      // the fog card
-const OVERSCAN = 0.06; // extra zoom at the ends of the scroll, none at the middle
+const OVERSCAN = 0.03; // extra zoom at the ends of the scroll, none at the middle
 
 // --- small vector helpers -------------------------------------------------
 const add = (a, b) => [a[0] + b[0], a[1] + b[1], a[2] + b[2]];
@@ -115,7 +115,7 @@ export default function (root) {
     const v = parseFloat(root.getAttribute(`data-${name}`));
     return Number.isFinite(v) ? v : fb;
   };
-  const ORBIT = (num('orbit', 3) * Math.PI) / 180, PIVOT = num('pivot', 7), RISE = num('rise', 0.25), DOLLY = num('dolly', 0.8);
+  const ORBIT = (num('orbit', 1.5) * Math.PI) / 180, PIVOT = num('pivot', 7), RISE = num('rise', 0.125), DOLLY = num('dolly', 0.4);
 
   // --- the original camera, rebuilt from the photo ---
   const fn = 0.5 / Math.tan((LENS * Math.PI) / 360);          // focal length in frame widths
