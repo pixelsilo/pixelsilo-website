@@ -21,6 +21,7 @@ import caseGallery from './modules/case-gallery.js';
 import caseVideo from './modules/case-video.js';
 import caseMotion from './modules/case-motion.js';
 import richCards from './modules/rich-cards.js';
+import portrait3d from './modules/portrait-3d.js';
 
 // Site-wide behaviour that runs on every page (thumb-video before the modules, so work-list finds its loops)
 const GLOBALS = [hideEmpty, consent, contactEvents, introduction, copyButton, themeToggle, thumbVideo, marqueeEager, cursor, headingIcon, smoothScroll, countUp];
@@ -38,6 +39,7 @@ const MODULES = {
   'case-video': caseVideo,
   'case-motion': caseMotion,
   'rich-cards': richCards,
+  'portrait-3d': portrait3d,
 };
 
 function boot() {
