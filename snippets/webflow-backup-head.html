@@ -1,0 +1,127 @@
+<!--
+  Webflow > Site settings > Custom code > HEAD, after the theme and consent snippets.
+  Inline on purpose: it mustn't depend on any CDN, since a blocked CDN is what it's for.
+  Site-agnostic: nothing in it is specific to pixelsilo.net, so it can go on any Webflow site
+  that hides content until its interactions run.
+
+  Why (17 Nov 2026): a visitor's network blocked Webflow's jQuery address
+  (d3e54v103j8qbb.cloudfront.net). Webflow's own script then stopped with
+  "TypeError: u is not a function" (u is jQuery), the interactions never started, and every
+  text block and image stayed hidden: a blank site. Company filters, VPNs and strict blockers
+  can block cloudfront.net addresses, and those are the networks our buyers sit behind.
+
+  1. jQuery backup. If Webflow's jQuery fails to load, load the same version from jsDelivr with
+     the integrity hash from Webflow's own tag (Webflow's copy is byte for byte the npm file, so
+     the hash matches; checked for 3.5.1), then run Webflow's two scripts (the webflow.*.js files
+     at the end of <body>) again so they start with jQuery there. Asynchronous: a slow or blocked
+     backup can't hold the page up. Only a visitor whose jQuery failed downloads anything extra.
+     Re-running is safe: the first run stops at jQuery before setting anything up (tested: the
+     same scroll triggers, split text and animations as a normal visit).
+
+  2. Safety net. Webflow hides animated content with a style that applies only until its
+     interactions start and add w-mod-ix3 to <html> (the html.w-mod-js:not(.w-mod-ix3) rules in
+     the head). Webflow adds the class at the page's load event. If one of Webflow's files fails
+     to load or crashes and the class doesn't arrive, this adds it, so everything shows without
+     the motion. It acts on that evidence, not on a guess at timing, so a slow phone never gets
+     it by mistake; the only timer is a last resort (8s after load) for failures it can't see.
+     ix-fallback marks a page where it happened, for spotting in the console.
+
+  3. Measurement. Each visit that needed 1 or 2 sends one anonymous report to the dashboard
+     (dashboard.pixelsilo.net/api/site-health, shown on Studio > Site health), and 1 in 20 normal
+     visits sends "ok" so the rate can be worked out. sendBeacon: fire and forget, nothing waits on
+     it. Only the outcome and the page path are sent; no cookie, no id. Set HEALTH to '' on a site
+     that shouldn't report (another client's site, until it has somewhere to report to).
+-->
+<script>
+(function () {
+  var d = document.documentElement;
+  // jQuery and Webflow's own scripts: the files the interactions can't start without. (Not GSAP:
+  // Webflow starts without it, and if its absence does crash Webflow, that crash counts.)
+  var WEBFLOW = /cloudfront\.net\/js\/jquery|\/js\/webflow\./;
+  var broken = false; // a Webflow file failed to load or crashed
+  var backup = 'none'; // none | loading | done
+  var shown = false;
+  var HEALTH = 'https://dashboard.pixelsilo.net/api/site-health';
+  var reported = false;
+
+  // One anonymous report per visit: what happened, and on which page.
+  function report(outcome) {
+    if (reported || !HEALTH || !navigator.sendBeacon) return;
+    reported = true;
+    try { navigator.sendBeacon(HEALTH, JSON.stringify({ o: outcome, p: location.pathname })); } catch (err) {}
+  }
+
+  function show() {
+    if (shown || d.classList.contains('w-mod-ix3')) return;
+    if (backup === 'loading') return; // the backup decides: it calls show() if it fails
+    shown = true;
+    d.classList.add('w-mod-ix3', 'ix-fallback');
+    report(backup === 'done' && !window.jQuery ? 'backup_failed' : broken ? 'fallback' : 'fallback_late');
+  }
+
+  function add(src, integrity, onload, onerror) {
+    var s = document.createElement('script');
+    s.src = src;
+    s.async = false; // run in the order added
+    if (integrity) { s.integrity = integrity; s.crossOrigin = 'anonymous'; }
+    if (onload) s.onload = onload;
+    if (onerror) s.onerror = onerror;
+    document.body.appendChild(s);
+  }
+
+  function startBackup(failedTag) {
+    var v = (failedTag.src.match(/jquery-(\d+\.\d+\.\d+)/) || [])[1];
+    if (!v || window.jQuery) return;
+    backup = 'loading';
+    var failed = function () {
+      if (backup !== 'loading') return;
+      backup = 'done';
+      show();
+    };
+    // After the page's own scripts have run (and stopped), so they can be run again in order.
+    var go = function () {
+      add('https://cdn.jsdelivr.net/npm/jquery@' + v + '/dist/jquery.min.js', failedTag.integrity, function () {
+        if (backup !== 'loading') return; // arrived after we'd given up: the content is already showing
+        if (!window.jQuery) return failed();
+        backup = 'done';
+        broken = false; // recovered; if Webflow crashes again on the rerun, the error handler says so
+        var own = document.querySelectorAll('script[src*="/js/webflow."]');
+        for (var i = 0; i < own.length; i++) add(own[i].src, own[i].integrity);
+      }, failed);
+      setTimeout(failed, 4000); // give up on a backup that hangs
+    };
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go);
+    else go();
+  }
+
+  window.addEventListener('error', function (e) {
+    var t = e.target;
+    if (t && t.tagName === 'SCRIPT') {
+      // A script that failed to load.
+      if (!WEBFLOW.test(t.src || '')) return;
+      broken = true;
+      if (backup === 'none' && /\/jquery-/.test(t.src)) startBackup(t);
+    } else if (e.filename && WEBFLOW.test(e.filename)) {
+      // A Webflow script that loaded but crashed. (Its first run after a failed jQuery crashes too,
+      // before the backup arrives: the backup's success clears that.)
+      if (backup === 'done' || backup === 'none') broken = true;
+    }
+    if (broken && document.readyState === 'complete') setTimeout(show, 500);
+  }, true);
+
+  window.addEventListener('load', function () {
+    setTimeout(function () { if (broken) show(); }, 500);
+    // The visit went fine (perhaps thanks to the backup): report it, or 1 in 20 normal ones.
+    setTimeout(function () {
+      if (shown || !d.classList.contains('w-mod-ix3')) return;
+      if (backup === 'done') report('backup_ok');
+      else if (Math.random() < 0.05) report('ok');
+    }, 1500);
+    setTimeout(show, 8000); // last resort, for a failure the checks above can't see
+  });
+  // If something broke and a stalled image or font is holding up the load event, don't wait for it.
+  document.addEventListener('DOMContentLoaded', function () {
+    setTimeout(function () { if (broken) show(); }, 3000);
+  });
+})();
+</script>
