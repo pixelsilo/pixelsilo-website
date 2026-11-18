@@ -4,6 +4,9 @@
 //   [data-module="case-video"]     the row; carries:
 //     data-video                   the project's Video field (a direct MP4 link)
 //     data-video-title             the project name, used as the video's accessible name
+//     data-video-poster            optional: an image shown until the film plays
+//   img[data-player="poster"]      optional, anywhere in the row (hidden): the same, from a bound
+//                                  CMS image field
 //   [data-player="frame"]          .media.is-player: a fixed full-width 32:9 frame, so the page never
 //                                  changes height
 //     [data-player="screen"]       .player_screen: the film, 16:9 between the middle two column lines;
@@ -24,5 +27,14 @@ export default function (root) {
     root.remove();
     return;
   }
-  createPlayer(frame).load(src, { title: root.getAttribute('data-video-title') || '' });
+  // The poster: data-video-poster on the row, or an image marked data-player="poster" (bound to a
+  // CMS image field in the Designer). The image is only a carrier, so it's removed once read.
+  const img = root.querySelector('img[data-player="poster"]');
+  let poster = (root.getAttribute('data-video-poster') || '').trim();
+  if (img) {
+    const url = img.getAttribute('src') || '';
+    if (!poster && url && !img.classList.contains('w-dyn-bind-empty') && !/placeholder/i.test(url)) poster = url;
+    img.remove();
+  }
+  createPlayer(frame).load(src, { title: root.getAttribute('data-video-title') || '', poster });
 }

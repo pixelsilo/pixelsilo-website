@@ -141,13 +141,15 @@ export default function createPlayer(frame) {
     sound();
   }
 
-  function load(src, { title = '', autoplay = false } = {}) {
+  function load(src, { title = '', autoplay = false, poster = '' } = {}) {
     unload();
     video = document.createElement('video');
     video.playsInline = true;
     video.preload = 'metadata';
-    // #t shows the first frame as the poster in browsers that otherwise show nothing (Safari)
-    video.src = src.includes('#') ? src : `${src}#t=0.001`;
+    if (poster) video.poster = poster; // shown until it plays, instead of the first frame
+    // Without a poster, #t shows the first frame in browsers that otherwise show nothing (Safari).
+    // With one it must be left off: #t seeks, and a video that has seeked stops showing its poster.
+    video.src = poster || src.includes('#') ? src : `${src}#t=0.001`;
     if (title) video.setAttribute('aria-label', `${title} film`);
     ['play', 'pause', 'ended'].forEach((type) => video.addEventListener(type, sync));
     ['timeupdate', 'loadedmetadata', 'durationchange'].forEach((type) => video.addEventListener(type, progress));
