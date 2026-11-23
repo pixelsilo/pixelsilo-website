@@ -552,3 +552,15 @@ This section is the current list. The "For Luke to check" lists further up were 
 6. Which reel cut: `pixelsilo-showreel-v1_1.mp4` is in use; `pixelsilo-showreel-public-v1.mp4` is the other.
 7. Eschler and Torre appear in the CGI page's work list as brand imagery. Confirm the 3D in both is yours to show there.
 8. Google Business Profile, Cambridge Network and local links: these decide the web design ranking more than the page does.
+
+---
+
+## Built in Webflow (23 Nov 2026)
+
+Both pages are on staging: `/cambridge-web-design` and `/cambridge-cgi`. Each is a duplicate of the homepage, so the header, footer, client strips, case study Collection List, process cards, diagram cards, FAQ, note from Luke and enquiries are the site's own sections, retexted. Case studies are a curated query on the same Projects list. Service and FAQ schema are set in each page's settings.
+
+New styles, all small combo classes: `section is-hero is-film`, `row is-over-film`, `hero_film`, `media_video is-reel`, `header is-over-film` (the last two use the dark theme mode). New site.js modules (v1.9.5): `scroll-drift`, `header-over-film`.
+
+Left out on purpose: the count-up figures (static versions would add one-off markup for numbers the headings already state) and the quotes row on the CGI page.
+
+Still to do: the films grid on the CGI page (copy the films Collection List and the film dialog from the Work page in the Designer, so the CMS bindings and conditional visibility come across natively).
