@@ -131,6 +131,15 @@ function textGlyphs(el) {
   });
 }
 
+// Glyph outline -> SVG path data. opentype's own toPathData writes NaN for some coordinates
+// (seen 23 Nov 2026: the Y of "READY" at x 165.6), which drops the glyph from the poster.
+const pathData = (cmds) => cmds.map((c) => {
+  if (c.type === 'M' || c.type === 'L') return `${c.type}${r3(c.x)} ${r3(c.y)}`;
+  if (c.type === 'Q') return `Q${r3(c.x1)} ${r3(c.y1)} ${r3(c.x)} ${r3(c.y)}`;
+  if (c.type === 'C') return `C${r3(c.x1)} ${r3(c.y1)} ${r3(c.x2)} ${r3(c.y2)} ${r3(c.x)} ${r3(c.y)}`;
+  return 'Z';
+}).join('');
+
 // The finished frame as a plain SVG: the Designer preview, and what shows without JS or motion
 function poster(els) {
   const paint = (spec, kind) => {
@@ -141,7 +150,7 @@ function poster(els) {
     if (el.t === 'TEXT') {
       return layoutText(el).map((g) => g.ch === '↗'
         ? arrowLines(g).map((pts) => `<polyline points="${pts.map((p) => p.map(r3).join(',')).join(' ')}" fill="none" ${paint(el.f[0], 'stroke')}/>`).join('')
-        : `<path d="${g.glyph.getPath(g.x, g.y, FONT_SIZE).toPathData(3)}" ${paint(el.f[0], 'fill')}/>`).join('');
+        : `<path d="${pathData(g.glyph.getPath(g.x, g.y, FONT_SIZE).commands)}" ${paint(el.f[0], 'fill')}/>`).join('');
     }
     if (el.t === 'VECTOR') {
       return `<polyline points="${el.pts.map(([px, py]) => `${el.x + px},${el.y + py}`).join(' ')}" fill="none" ${paint(el.s[0], 'stroke')}/>`;
