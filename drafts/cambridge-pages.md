@@ -563,4 +563,4 @@ New styles, all small combo classes: `section is-hero is-film`, `row is-over-fil
 
 Left out on purpose: the count-up figures (static versions would add one-off markup for numbers the headings already state) and the quotes row on the CGI page.
 
-Still to do: the films grid on the CGI page (copy the films Collection List and the film dialog from the Work page in the Designer, so the CMS bindings and conditional visibility come across natively).
+Films grid on the CGI page: rebuilt natively (23 Nov 2026) as a Collection List on Projects, filter Films and renders on, sorted by Order, with the same classes and CMS bindings as the Work page, plus the film-lightbox dialog. Its card label and experience note use Webflow conditional visibility (set by Luke in the Designer: Card label is set, Experience note is set), not the data-hide-empty-parent script.
