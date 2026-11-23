@@ -564,3 +564,8 @@ New styles, all small combo classes: `section is-hero is-film`, `row is-over-fil
 Left out on purpose: the count-up figures (static versions would add one-off markup for numbers the headings already state) and the quotes row on the CGI page.
 
 Films grid on the CGI page: rebuilt natively (23 Nov 2026) as a Collection List on Projects, filter Films and renders on, sorted by Order, with the same classes and CMS bindings as the Work page, plus the film-lightbox dialog. Its card label and experience note use Webflow conditional visibility (set by Luke in the Designer: Card label is set, Experience note is set), not the data-hide-empty-parent script.
+
+### Changes (23 Nov 2026, evening)
+
+- CGI page: the second Cambridge photo strip (punts, and the punt under the bridge) now sits in its own section under the FAQ, above the enquiries. "Build it once" keeps its text; Luke will send CGI imagery for a grid there.
+- Web design page: the four diagrams are redrawn in the technical style of the CGI set (v1.9.6): rule-outs falling page by page to none; a tangled brief resolved into a structure read at two depths (1 min, 5 min); three framed portraits; accuracy left alone against reviewed monthly.
